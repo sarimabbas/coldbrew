@@ -1,9 +1,8 @@
-import React from "react";
-import { SearchIcon, InboxInIcon } from "@heroicons/react/solid";
-import { useAtom, useSetAtom } from "jotai";
+import { InboxInIcon, SearchIcon } from "@heroicons/react/solid";
+import cx from "classnames";
+import { useSetAtom } from "jotai";
 import { searchQueryAtom } from "../lib/store";
 import useSelectedCasks from "../lib/useSelectedCasks";
-import cx from "classnames";
 
 const Navbar = () => {
   const setSearchQuery = useSetAtom(searchQueryAtom);
