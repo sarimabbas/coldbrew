@@ -1,61 +1,40 @@
 import type { NextPage } from "next";
-import { GetStaticProps, GetStaticPaths, GetServerSideProps } from "next";
-import Image from "next/image";
+import { GetStaticProps } from "next";
+import dynamic from "next/dynamic";
 import { getApps, IGetApps } from "../lib";
+
+const CaskGridNoSSR = dynamic(() => import("../components/CaskGrid"), {
+  ssr: false,
+});
 
 interface Props {
   apps: IGetApps;
 }
 
 const Home: NextPage<Props> = ({ apps }) => {
+  const casks = apps.casksResponse.casks ?? [];
+
   return (
-    <div className="p-4">
-      <h1 className="font-bold">Coldbrew</h1>
-      <h2>
-        A visual interface to quickly install your favorite macOS apps from
-        Homebrew Cask
-      </h2>
-      <br />
-      <div
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
-        style={{
-          gridAutoRows: "1fr",
-        }}
-      >
-        {apps.casksResponse.casks.map((cask) => {
-          return (
-            <div
-              key={cask.cask}
-              className="border shadow-sm p-4 rounded-md flex flex-col justify-between"
-            >
-              {/* header */}
-              <div className="flex gap-4 justify-between">
-                <div>{cask.name || cask.cask}</div>
-                {cask.logo && (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    onError={(event) =>
-                      (event.currentTarget.style.display = "none")
-                    }
-                    src={cask.logo}
-                    alt={cask.name ?? cask.cask}
-                    loading="lazy"
-                    className="h-10 w-10 object-cover rounded-full overflow-hidden flex-shrink-0 border"
-                  />
-                )}
-              </div>
-              {/* meta */}
-              <div className="flex flex-col gap-4">
-                <div className="font-mono text-xs">{cask.cask}</div>
-                <div className="flex gap-4 opacity-50 text-sm">
-                  <div className="">#{cask.number}</div>
-                  <div>{cask.count} installs</div>
-                </div>
-              </div>
-            </div>
-          );
-        })}
+    // dark:bg-black dark:text-white
+    <div className="">
+      {/* navbar */}
+      <div className="sticky top-0 backdrop-blur-md p-4 bg-white/30 border-b border-opacity-50 flex justify-between items-center flex-wrap gap-4 z-50">
+        {/* left */}
+        <div>
+          <h1 className="font-bold">Coldbrew</h1>
+          <h2>
+            A visual interface to quickly install your favorite macOS apps from
+            Homebrew Cask
+          </h2>
+        </div>
+        {/* right */}
+        <div>
+          <button>Cart</button>
+        </div>
       </div>
+      <br />
+      {/* grid */}
+      <CaskGridNoSSR casks={casks} />
     </div>
   );
 };
@@ -71,3 +50,12 @@ export const getStaticProps: GetStaticProps<Props> = async (context) => {
     },
   };
 };
+
+{
+  /* <div
+className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 p-4"
+style={{
+  gridAutoRows: "1fr",
+}}
+></div>  */
+}
