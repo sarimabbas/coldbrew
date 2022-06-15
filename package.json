@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@heroicons/react": "^1.0.6",
+    "@radix-ui/react-dialog": "^0.1.7",
     "classnames": "^2.3.1",
     "jotai": "^1.7.2",
     "masonic": "^3.6.5",

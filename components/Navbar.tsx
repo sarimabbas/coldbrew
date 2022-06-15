@@ -1,15 +1,16 @@
 import { InboxInIcon, SearchIcon } from "@heroicons/react/solid";
 import cx from "classnames";
 import { useSetAtom } from "jotai";
-import { searchQueryAtom } from "../lib/store";
+import { searchQueryAtom, showDownloadDialogAtom } from "../lib/store";
 import useSelectedCasks from "../lib/useSelectedCasks";
 
 const Navbar = () => {
   const setSearchQuery = useSetAtom(searchQueryAtom);
   const { selectedCasks } = useSelectedCasks();
+  const showDownloadDialog = useSetAtom(showDownloadDialogAtom);
 
   return (
-    <div className="sticky top-0 backdrop-blur-md p-4 bg-white/30 border-b border-opacity-50 flex justify-between items-center flex-wrap gap-4 z-50">
+    <div className="sticky top-0 backdrop-blur-md p-4 bg-white/30 border-b border-opacity-50 flex justify-between items-center flex-wrap gap-4 z-10">
       {/* left */}
       <div className="flex flex-col gap-4">
         {/* text */}
@@ -39,6 +40,7 @@ const Navbar = () => {
               "opacity-50 cursor-not-allowed": selectedCasks.length < 1,
             })}
             disabled={selectedCasks.length < 1}
+            onClick={() => showDownloadDialog(true)}
           >
             {selectedCasks.length > 0 && (
               <div className="absolute top-0 right-0 h-4 w-fit px-1 bg-red-600 rounded-full text-white font-mono flex items-center justify-center text-xs translate-x-2 -translate-y-2 shadow-md">

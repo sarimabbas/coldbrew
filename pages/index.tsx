@@ -1,11 +1,12 @@
-import { useAtomValue } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import type { NextPage } from "next";
 import { GetStaticProps } from "next";
 import dynamic from "next/dynamic";
 import Head from "next/head";
+import DownloadDialog from "../components/DownloadDialog";
 import Navbar from "../components/Navbar";
 import { getApps, IGetApps } from "../lib";
-import { searchQueryAtom } from "../lib/store";
+import { searchQueryAtom, showDownloadDialogAtom } from "../lib/store";
 
 const CaskGridNoSSR = dynamic(() => import("../components/CaskGrid"), {
   ssr: false,
@@ -33,6 +34,7 @@ const Home: NextPage<Props> = ({ apps }) => {
           content="A visual interface to quickly install your favorite macOS apps from Homebrew Cask"
         />
       </Head>
+      <DownloadDialog />
       <Navbar />
       <CaskGridNoSSR casks={filteredCasks} />
     </div>
