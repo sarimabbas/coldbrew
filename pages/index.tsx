@@ -48,7 +48,5 @@ export const getStaticProps: GetStaticProps<Props> = async (context) => {
     props: {
       apps,
     },
-    // regenerate the page every 12 hours
-    revalidate: 43200,
   };
 };
