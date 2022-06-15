@@ -19,7 +19,7 @@ const CaskCard = ({ cask }: ICaskCardProps) => {
       className={cx(
         "border shadow-sm p-4 rounded-md flex flex-col justify-between gap-4",
         {
-          "border-yellow-300": isSelected(cask),
+          "border-yellow-300 shadow-yellow-300": isSelected(cask),
         }
       )}
     >
