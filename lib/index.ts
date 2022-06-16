@@ -31,7 +31,6 @@ const casksDetailEndpoint = `https://formulae.brew.sh/api/cask.json`;
 interface IGetCasks {
   casksList: ICask[];
   casksCount: number;
-  casksMap: Record<string, ICask>;
 }
 
 // from https://formulae.brew.sh/api/cask.json
@@ -71,21 +70,9 @@ export const getCasks = async (): Promise<IGetCasks> => {
     item.name = detailMap[item.cask]?.name?.[0] ?? null;
   });
 
-  // also create a final hashmap
-  const casksMap: Record<string, ICask> = items.reduce(
-    (prev: Record<string, ICask>, curr: ICask) => ({
-      ...prev,
-      [curr.cask]: {
-        ...curr,
-      },
-    }),
-    {}
-  );
-
   return {
     casksList: items,
     casksCount: totalItems,
-    casksMap,
   };
 };
 
@@ -94,15 +81,13 @@ export const getCasks = async (): Promise<IGetCasks> => {
 export interface IGetApps {
   casksList: ICask[];
   casksCount: number;
-  casksMap: Record<string, ICask>;
 }
 
 export const getApps = async (): Promise<IGetApps> => {
-  const { casksCount, casksList, casksMap } = await getCasks();
+  const { casksCount, casksList } = await getCasks();
 
   return {
     casksList,
     casksCount,
-    casksMap,
   };
 };

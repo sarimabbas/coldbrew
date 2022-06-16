@@ -1,13 +1,17 @@
 import "../styles/globals.css";
-import type { AppProps } from "next/app";
-import { NextQueryParamProvider } from "next-query-params";
+import { withTRPC } from "@trpc/next";
+import { AppType } from "next/dist/shared/lib/utils";
+import { AppRouter } from "./api/trpc/[trpc]";
 
-function MyApp({ Component, pageProps }: AppProps) {
-  return (
-    <NextQueryParamProvider>
-      <Component {...pageProps} />
-    </NextQueryParamProvider>
-  );
-}
+const MyApp: AppType = ({ Component, pageProps }) => {
+  return <Component {...pageProps} />;
+};
 
-export default MyApp;
+export default withTRPC<AppRouter>({
+  config: () => {
+    return {
+      url: process.env.TRPC_SERVER_URL!,
+    };
+  },
+  ssr: false,
+})(MyApp);
