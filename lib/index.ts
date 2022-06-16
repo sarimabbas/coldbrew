@@ -29,8 +29,9 @@ const casksListEndpoint =
 const casksDetailEndpoint = `https://formulae.brew.sh/api/cask.json`;
 
 interface IGetCasks {
-  casks: ICask[];
-  totalCasks: number;
+  casksList: ICask[];
+  casksCount: number;
+  casksMap: Record<string, ICask>;
 }
 
 // from https://formulae.brew.sh/api/cask.json
@@ -49,7 +50,7 @@ export const getCasks = async (): Promise<IGetCasks> => {
   const popularListResponse = await fetch(casksListEndpoint);
   const popularListData = await popularListResponse.json();
   const totalItems = popularListData?.["total_items"] as number;
-  const items = popularListData?.["items"] as ICask[];
+  const items = (popularListData?.["items"] as ICask[]) ?? [];
 
   // put details into hashmap
   const detailResponse = await fetch(casksDetailEndpoint);
@@ -70,22 +71,38 @@ export const getCasks = async (): Promise<IGetCasks> => {
     item.name = detailMap[item.cask]?.name?.[0] ?? null;
   });
 
+  // also create a final hashmap
+  const casksMap: Record<string, ICask> = items.reduce(
+    (prev: Record<string, ICask>, curr: ICask) => ({
+      ...prev,
+      [curr.cask]: {
+        ...curr,
+      },
+    }),
+    {}
+  );
+
   return {
-    casks: items,
-    totalCasks: totalItems,
+    casksList: items,
+    casksCount: totalItems,
+    casksMap,
   };
 };
 
 // -------
 
 export interface IGetApps {
-  casksResponse: IGetCasks;
+  casksList: ICask[];
+  casksCount: number;
+  casksMap: Record<string, ICask>;
 }
 
 export const getApps = async (): Promise<IGetApps> => {
-  const casksResponse = await getCasks();
+  const { casksCount, casksList, casksMap } = await getCasks();
 
   return {
-    casksResponse,
+    casksList,
+    casksCount,
+    casksMap,
   };
 };

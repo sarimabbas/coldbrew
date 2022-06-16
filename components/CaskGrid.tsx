@@ -1,22 +1,21 @@
-import React from "react";
+import { useAtomValue } from "jotai";
 import { Masonry } from "masonic";
 import { ICask } from "../lib";
-import CaskCard from "./CaskCard";
-import { useAtomValue } from "jotai";
 import { searchQueryAtom } from "../lib/store";
+import CaskCard from "./CaskCard";
 
 interface ICaskGridProps {
-  casks: ICask[];
+  casksList: ICask[];
 }
 
-const CaskGrid = ({ casks }: ICaskGridProps) => {
+const CaskGrid = ({ casksList }: ICaskGridProps) => {
   const searchQuery = useAtomValue(searchQueryAtom);
 
   return (
     <div className="p-4">
       <Masonry
         columnGutter={20}
-        items={casks}
+        items={casksList}
         key={searchQuery}
         itemKey={(data, idx) => data?.cask}
         render={({ index, data, width }) => <CaskCard cask={data} />}

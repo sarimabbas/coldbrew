@@ -1,6 +1,5 @@
-import React from "react";
-import { ICask } from "../lib";
 import cx from "classnames";
+import { ICask } from "../lib";
 import useSelectedCasks from "../lib/useSelectedCasks";
 
 interface ICaskCardProps {

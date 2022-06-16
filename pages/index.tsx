@@ -6,7 +6,8 @@ import Head from "next/head";
 import DownloadDialog from "../components/DownloadDialog";
 import Navbar from "../components/Navbar";
 import { getApps, IGetApps } from "../lib";
-import { searchQueryAtom, showDownloadDialogAtom } from "../lib/store";
+import { casksMapAtom, searchQueryAtom } from "../lib/store";
+import { useEffect, useCallback } from "react";
 
 const CaskGridNoSSR = dynamic(() => import("../components/CaskGrid"), {
   ssr: false,
@@ -17,12 +18,24 @@ interface Props {
 }
 
 const Home: NextPage<Props> = ({ apps }) => {
-  const casks = apps.casksResponse.casks ?? [];
+  const { casksMap, casksList } = apps;
+
+  // search query to filter by
   const searchQuery = useAtomValue(searchQueryAtom);
-  const filteredCasks = casks.filter((c) => {
+  const filteredCasks = casksList.filter((c) => {
     const caskName = c.name ?? c.cask;
     return caskName.toLowerCase().includes(searchQuery);
   });
+
+  // set cask maps in global state
+  const setCasksMap = useSetAtom(casksMapAtom);
+  const setCasksCallback = useCallback(() => {
+    console.log("setting cassks map ");
+    setCasksMap(casksMap);
+  }, [casksMap, setCasksMap]);
+  useEffect(() => {
+    setCasksCallback();
+  }, [setCasksCallback]);
 
   return (
     // dark:bg-black dark:text-white
@@ -36,7 +49,7 @@ const Home: NextPage<Props> = ({ apps }) => {
       </Head>
       <DownloadDialog />
       <Navbar />
-      <CaskGridNoSSR casks={filteredCasks} />
+      <CaskGridNoSSR casksList={filteredCasks} />
     </div>
   );
 };
