@@ -1,3 +1,5 @@
+import fetch from "node-fetch";
+
 export interface ICask {
   // ranking in terms of # of installs
   number: number;
@@ -48,8 +50,8 @@ export const getCasks = async (): Promise<IGetCasks> => {
   // get the top popular casks
   const popularListResponse = await fetch(casksListEndpoint);
   const popularListData = await popularListResponse.json();
-  const totalItems = popularListData?.["total_items"] as number;
-  const items = (popularListData?.["items"] as ICask[]) ?? [];
+  const totalItems = (popularListData as any)?.["total_items"] as number;
+  const items = ((popularListData as any)?.["items"] as ICask[]) ?? [];
 
   // put details into hashmap
   const detailResponse = await fetch(casksDetailEndpoint);

@@ -2,10 +2,6 @@ import { atom } from "jotai";
 import { atomWithStorage, createJSONStorage } from "jotai/utils";
 import { ICask } from ".";
 
-export const selectedCasksAtom = atom<ICask[]>([]);
-
-export const searchQueryAtom = atom<string>("");
-
 export const showDownloadDialogAtom = atom<boolean>(false);
 
 export const casksMapAtom = atom<Record<string, ICask>>({});
@@ -16,3 +12,7 @@ export const sessionIdentifierAtom = atomWithStorage<string>(
   "",
   sessionStorageAdapter
 );
+
+export const showSelectedOnlyAtom = atom<boolean>(false);
+
+export const navbarHeightAtom = atom<number>(0);

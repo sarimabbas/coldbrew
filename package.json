@@ -7,24 +7,32 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "prisma:push": "doppler run -- npx prisma db push"
+    "prisma:push": "doppler run -- npx prisma db push",
+    "prisma:generate": "doppler run -- npx prisma generate",
+    "prisma:studio": "doppler run -- npx prisma studio"
   },
   "dependencies": {
     "@heroicons/react": "^1.0.6",
     "@prisma/client": "^3.15.2",
     "@radix-ui/react-dialog": "^0.1.7",
+    "@radix-ui/react-switch": "^0.1.5",
     "@trpc/client": "^9.25.2",
     "@trpc/next": "^9.25.2",
     "@trpc/react": "^9.25.2",
     "@trpc/server": "^9.25.2",
+    "babel-plugin-superjson-next": "^0.4.3",
     "classnames": "^2.3.1",
     "jotai": "^1.7.2",
     "masonic": "^3.6.5",
     "next": "12.1.6",
-    "next-query-params": "^2.2.1",
+    "next-themes": "^0.2.0",
+    "node-fetch": "^3.2.6",
+    "p-limit": "^4.0.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-query": "^3.39.1",
+    "superjson": "^1.9.1",
+    "use-debounce": "^8.0.1",
     "zod": "^3.17.3"
   },
   "devDependencies": {
@@ -35,7 +43,6 @@
     "autoprefixer": "^10.4.7",
     "eslint": "8.17.0",
     "eslint-config-next": "12.1.6",
-    "node-fetch": "^3.2.6",
     "postcss": "^8.4.14",
     "tailwindcss": "^3.1.3",
     "typescript": "^4.7.3"

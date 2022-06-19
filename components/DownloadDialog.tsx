@@ -8,34 +8,32 @@ import { useAtom } from "jotai";
 import Link from "next/link";
 import { showDownloadDialogAtom } from "../lib/store";
 import useClipboard from "../lib/useClipboard";
-import useSelectedCasks from "../lib/useSelectedCasks";
+import { useSession } from "../lib/useSession";
 import CaskCard from "./CaskCard";
 
 interface IDownloadDialogProps {}
 
 const DownloadDialog = (props: IDownloadDialogProps) => {
-  const { casksParam, selectedCasks } = useSelectedCasks();
+  const { session, isCaskSelected, toggleSelectedCask } = useSession();
   const [isOpen, setIsOpen] = useAtom(showDownloadDialogAtom);
 
   const shellCommand = `curl -sSL ${
     process.env.NODE_ENV === "development"
       ? "http://localhost:3000/"
       : "https://coldbrew.doom.sh/"
-  }api/download?casks=${encodeURIComponent((casksParam ?? []).join(","))} | sh`;
+  }api/download?session=${encodeURIComponent(session?.id ?? "")} | sh`;
 
   const brewfileLink = `${
     process.env.NODE_ENV === "development"
       ? "http://localhost:3000/"
       : "https://coldbrew.doom.sh/"
-  }api/download?casks=${encodeURIComponent(
-    (casksParam ?? []).join(",")
-  )}&file=true`;
+  }api/download?session=${encodeURIComponent(session?.id ?? "")}&file=true`;
 
   const shareLink = `${
     process.env.NODE_ENV === "development"
       ? "http://localhost:3000/"
       : "https://coldbrew.doom.sh/"
-  }?casks=${encodeURIComponent((casksParam ?? []).join(","))}`;
+  }?session=${encodeURIComponent(session?.id ?? "")}`;
 
   const { copyText: copyShellCommand, isHot: copyShellCommandHot } =
     useClipboard({ text: shellCommand });
@@ -47,8 +45,8 @@ const DownloadDialog = (props: IDownloadDialogProps) => {
   return (
     <Dialog.Root open={isOpen} onOpenChange={(open) => setIsOpen(open)}>
       <Dialog.Portal>
-        <Dialog.Overlay className="bg-slate-300/50 backdrop-blur-sm top-0 right-0 left-0 bottom-0 fixed grid place-items-center overflow-y-auto z-20">
-          <Dialog.Content className="shadow-lg p-4 border rounded-md z-30 min-w-[50%] max-w-[60%] bg-white relative">
+        <Dialog.Overlay className="bg-slate-300/50 dark:bg-slate-800/50 backdrop-blur-sm top-0 right-0 left-0 bottom-0 fixed grid place-items-center overflow-y-auto z-20">
+          <Dialog.Content className="shadow-lg p-4 border rounded-md z-30 min-w-[50%] max-w-[60%] bg-white dark:bg-black relative dark:border-gray-600">
             <Dialog.Title className="font-bold text-lg">Your apps</Dialog.Title>
             <Dialog.Description>
               Here&apos;s everything you have selected
@@ -61,10 +59,14 @@ const DownloadDialog = (props: IDownloadDialogProps) => {
               className="flex gap-4 overflow-x-scroll my-4 mb-8 py-1"
               style={{}}
             >
-              {selectedCasks.map((c) => {
+              {session?.casks.map((c) => {
                 return (
-                  <div className=" flex-shrink-0" key={c.cask}>
-                    <CaskCard cask={c} />
+                  <div className=" flex-shrink-0" key={c.id}>
+                    <CaskCard
+                      cask={c}
+                      isSelected={isCaskSelected(c)}
+                      toggleSelected={() => toggleSelectedCask(c)}
+                    />
                   </div>
                 );
               })}

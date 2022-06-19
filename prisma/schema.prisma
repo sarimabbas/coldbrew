@@ -18,11 +18,15 @@ model Session {
 }
 
 model Cask {
-  id        String   @id @default(uuid())
-  caskId    String   @db.Text()
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id             String   @id
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  name           String?
+  homepage       String?
+  logoUrl        String?
+  ranking        Int?
+  installCount   String?
+  installPercent String?
 
-  Session   Session? @relation(fields: [sessionId], references: [id])
-  sessionId String?
+  sessions Session[]
 }

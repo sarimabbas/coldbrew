@@ -1,27 +1,30 @@
-import { useAtomValue } from "jotai";
-import { Masonry } from "masonic";
-import { ICask } from "../lib";
-import { searchQueryAtom } from "../lib/store";
+import { Cask } from "@prisma/client";
+import { memo } from "react";
+import { useSession } from "../lib/useSession";
 import CaskCard from "./CaskCard";
 
 interface ICaskGridProps {
-  casksList: ICask[];
+  casks: Cask[];
 }
 
-const CaskGrid = ({ casksList }: ICaskGridProps) => {
-  const searchQuery = useAtomValue(searchQueryAtom);
+const CaskGrid = memo((props: ICaskGridProps) => {
+  const { casks } = props;
+  const { isCaskSelected, toggleSelectedCask } = useSession();
 
   return (
-    <div className="p-4">
-      <Masonry
-        columnGutter={20}
-        items={casksList}
-        key={searchQuery}
-        itemKey={(data, idx) => data?.cask}
-        render={({ index, data, width }) => <CaskCard cask={data} />}
-      />
+    <div className="p-4 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+      {casks.map((c) => (
+        <CaskCard
+          key={c.id}
+          cask={c}
+          isSelected={isCaskSelected(c)}
+          toggleSelected={() => toggleSelectedCask(c)}
+        />
+      ))}
     </div>
   );
-};
+});
+
+CaskGrid.displayName = "CaskGrid";
 
 export default CaskGrid;

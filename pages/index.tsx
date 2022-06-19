@@ -1,42 +1,24 @@
-import { useAtomValue } from "jotai";
 import type { NextPage } from "next";
-import { GetStaticProps } from "next";
-import dynamic from "next/dynamic";
 import Head from "next/head";
-import { useMemo } from "react";
+import { useDebounce } from "use-debounce";
+import CaskGrid from "../components/CaskGrid";
 import DownloadDialog from "../components/DownloadDialog";
 import Navbar from "../components/Navbar";
-import { getApps, IGetApps } from "../lib";
-import { searchQueryAtom } from "../lib/store";
-import useSession from "../lib/useSession";
+import { trpc } from "../lib/trpc";
+import useSearch from "../lib/useSearch";
+import { useCreateSession } from "../lib/useSession";
 
-const CaskGridNoSSR = dynamic(() => import("../components/CaskGrid"), {
-  ssr: false,
-});
+const Home: NextPage = () => {
+  useCreateSession();
 
-interface Props {
-  apps: IGetApps;
-}
+  const { searchQuery } = useSearch();
+  const [debouncedSearchQuery] = useDebounce(searchQuery, 80);
+  const { data } = trpc.useQuery(["getCasks", { query: debouncedSearchQuery }]);
 
-const Home: NextPage<Props> = ({ apps }) => {
-  const { casksList } = apps;
-  useSession();
-
-  // search query to filter by
-  const searchQuery = useAtomValue(searchQueryAtom);
-  const filteredCasks = useMemo(() => {
-    if (casksList.length > 0) {
-      return casksList.filter((c) => {
-        const caskName = c.name ?? c.cask;
-        return caskName.toLowerCase().includes(searchQuery);
-      });
-    }
-    return [];
-  }, [casksList, searchQuery]);
+  console.log("casks:", data);
 
   return (
-    // dark:bg-black dark:text-white
-    <div className="">
+    <div>
       <Head>
         <title>Coldbrew</title>
         <meta
@@ -46,19 +28,9 @@ const Home: NextPage<Props> = ({ apps }) => {
       </Head>
       <DownloadDialog />
       <Navbar />
-      <CaskGridNoSSR casksList={filteredCasks ?? []} />
+      <CaskGrid casks={data ?? []} />
     </div>
   );
 };
 
 export default Home;
-
-export const getStaticProps: GetStaticProps<Props> = async (context) => {
-  const apps = await getApps();
-
-  return {
-    props: {
-      apps,
-    },
-  };
-};

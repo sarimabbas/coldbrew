@@ -1,21 +1,30 @@
 import type { NextApiRequest, NextApiResponse } from "next";
+import { prisma } from "../../lib/db";
 
 // outputs a brewfile or script as with brewfile as here document
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  const { casks: casksParam, file: fileParam } = req.query;
+  const { session: sessionParam, file: fileParam } = req.query;
 
-  let casks: string[] = [];
-  if (Array.isArray(casksParam)) {
-    casks = casksParam.reduce(
-      (prev: string[], curr) =>
-        prev.concat(decodeURIComponent(curr).split(",")),
-      []
-    );
-  } else {
-    casks = decodeURIComponent(casksParam).split(",");
+  if (!sessionParam) {
+    res.status(400).send("no session param");
   }
 
-  const brewfile = [casks.map((c) => `cask "${c}"`).join("\n")].join("\n");
+  const sessionId = Array.isArray(sessionParam)
+    ? sessionParam?.[0]
+    : sessionParam;
+
+  const session = await prisma.session.findFirst({
+    where: {
+      id: sessionId,
+    },
+    include: {
+      casks: true,
+    },
+  });
+
+  const casks = session?.casks ?? [];
+
+  const brewfile = [casks.map((c) => `cask "${c.id}"`).join("\n")].join("\n");
 
   if (fileParam) {
     res.setHeader("Content-Type", "text/plain");

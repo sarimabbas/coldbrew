@@ -1,18 +1,44 @@
-import { InboxInIcon, SearchIcon } from "@heroicons/react/solid";
+import { RefreshIcon } from "@heroicons/react/solid";
 import cx from "classnames";
-import { useSetAtom } from "jotai";
-import { searchQueryAtom, showDownloadDialogAtom } from "../lib/store";
-import useSelectedCasks from "../lib/useSelectedCasks";
+import { useCallback, useEffect, useState } from "react";
+import { useIsFetching } from "react-query";
+import Cart from "./Cart";
+import Search from "./Search";
+import ThemeToggle from "./ThemeToggle";
+import ToggleSelected from "./ToggleSelected";
 
 const Navbar = () => {
-  const setSearchQuery = useSetAtom(searchQueryAtom);
-  const { selectedCasks } = useSelectedCasks();
-  const showDownloadDialog = useSetAtom(showDownloadDialogAtom);
+  const isFetching = useIsFetching();
+
+  const onNavbarScroll = useCallback(() => {
+    const amountScrolled = document.scrollingElement?.scrollTop ?? 0;
+    if (amountScrolled > 5) {
+      setShowNavbarBorder(true);
+    } else {
+      setShowNavbarBorder(false);
+    }
+  }, []);
+
+  const [showNavbarBorder, setShowNavbarBorder] = useState<boolean>(false);
+  useEffect(() => {
+    document.addEventListener("scroll", onNavbarScroll);
+    return () => {
+      document.removeEventListener("scroll", onNavbarScroll);
+    };
+  }, [onNavbarScroll]);
 
   return (
-    <div className="sticky top-0 backdrop-blur-md p-4 bg-white/30 border-b border-opacity-50 flex justify-between items-center flex-wrap gap-4 z-10">
+    <div
+      className={cx(
+        "sticky top-0 backdrop-blur-md p-4  border-b flex justify-between items-center flex-wrap gap-4 z-10 transition-all duration-75",
+        {
+          "border-solid": showNavbarBorder,
+          "border-none": !showNavbarBorder,
+        }
+      )}
+    >
       {/* left */}
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-4 flex-1">
         {/* text */}
         <div className="">
           <h1 className="font-bold">Coldbrew</h1>
@@ -22,33 +48,20 @@ const Navbar = () => {
           </h2>
         </div>
         {/* bottom */}
-        <div className="flex gap-8 items-center">
-          {/* search */}
-          <div className="flex gap-2 items-center relative">
-            <SearchIcon className="h-4 z-20 absolute left-4" />
-            <input
-              type="text"
-              className="border rounded-full shadow-sm w-fit px-4 py-2 text-sm pl-10"
-              onChange={(e) =>
-                setSearchQuery(e.currentTarget.value.toLowerCase())
-              }
-            />
-          </div>
-          {/* cart */}
-          <button
-            className={cx("relative", {
-              "opacity-50 cursor-not-allowed": selectedCasks.length < 1,
-            })}
-            disabled={selectedCasks.length < 1}
-            onClick={() => showDownloadDialog(true)}
-          >
-            {selectedCasks.length > 0 && (
-              <div className="absolute top-0 right-0 h-4 w-fit px-1 bg-red-600 rounded-full text-white font-mono flex items-center justify-center text-xs translate-x-2 -translate-y-2 shadow-md">
-                {selectedCasks.length}
-              </div>
+        <div className="flex gap-8 items-center justify-between flex-wrap">
+          <div className="flex gap-8 items-center flex-wrap flex-1">
+            <Search />
+            <ThemeToggle />
+            {/* <ToggleSelected /> */}
+            {isFetching > 0 ? (
+              <RefreshIcon className="h-4 animate-spin opacity-50" />
+            ) : (
+              <div className="w-4 h-4" />
             )}
-            <InboxInIcon className={"h-8"} />
-          </button>
+          </div>
+          <div>
+            <Cart />
+          </div>
         </div>
       </div>
       {/* right */}
