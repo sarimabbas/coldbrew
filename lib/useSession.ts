@@ -1,10 +1,26 @@
-import { useAtom, useAtomValue } from "jotai";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useEffect } from "react";
-import { sessionIdentifierAtom } from "./store";
+import { atomWithStorage, createJSONStorage } from "jotai/utils";
 import { trpc } from "./trpc";
 import { Cask } from "@prisma/client";
 import { useMemo, useCallback } from "react";
 import { useTrackParallelMutations } from "./useTrackParallelMutations";
+
+// ----- SESSION STORAGE
+
+const sessionStorageAdapter = createJSONStorage<string>(() => sessionStorage);
+export const sessionIdentifierAtom = atomWithStorage<string>(
+  "coldbrewSessionId",
+  "",
+  sessionStorageAdapter
+);
+export const sessionAccessTokenAtom = atomWithStorage<string>(
+  "coldbrewSessionAccessToken",
+  "",
+  sessionStorageAdapter
+);
+
+// -----
 
 const createEmptyCask = (): Cask => ({
   id: Math.random.toString(),
@@ -22,9 +38,11 @@ export const useCreateSession = () => {
   const [sessionIdentifier, setSessionIdentifier] = useAtom(
     sessionIdentifierAtom
   );
+  const setSessionAccessToken = useSetAtom(sessionAccessTokenAtom);
   const { mutate } = trpc.useMutation("createNewSession", {
     onSuccess: (data) => {
       setSessionIdentifier(data.id);
+      setSessionAccessToken(data.accessToken ?? "");
     },
   });
 
@@ -39,6 +57,7 @@ export const useCreateSession = () => {
 
 export const useSession = () => {
   const sessionIdentifier = useAtomValue(sessionIdentifierAtom);
+  const sessionAccessToken = useAtomValue(sessionAccessTokenAtom);
 
   const mutationTracker = useTrackParallelMutations();
 
@@ -138,11 +157,13 @@ export const useSession = () => {
         return removeCaskFromSessionMutation.mutate({
           sessionId: session.id,
           caskId: cask.id,
+          accessToken: sessionAccessToken,
         });
       } else {
         return addCaskToSessionMutation.mutate({
           sessionId: session.id,
           caskId: cask.id,
+          accessToken: sessionAccessToken,
         });
       }
     },
@@ -151,6 +172,7 @@ export const useSession = () => {
       removeCaskFromSessionMutation,
       casks,
       session?.id,
+      sessionAccessToken,
     ]
   );
 

@@ -2,6 +2,7 @@ import * as trpc from "@trpc/server";
 import * as trpcNext from "@trpc/server/adapters/next";
 import { z } from "zod";
 import { prisma } from "../../../lib/db";
+import { exclude } from "../../../lib/utils";
 
 export const appRouter = trpc
   .router()
@@ -18,7 +19,10 @@ export const appRouter = trpc
           casks: true,
         },
       });
-      return session;
+      if (session) {
+        return exclude(session, "accessToken");
+      }
+      return null;
     },
   })
   .query("getCasks", {
@@ -67,10 +71,24 @@ export const appRouter = trpc
   .mutation("removeCaskFromSession", {
     input: z.object({
       sessionId: z.string(),
+      accessToken: z.string(),
       caskId: z.string(),
     }),
     async resolve({ input }) {
-      return prisma.session.update({
+      // check token
+      const findSession = await prisma.session.findFirst({
+        where: {
+          AND: [{ id: input.sessionId }, { accessToken: input.accessToken }],
+        },
+      });
+      if (!findSession) {
+        throw new trpc.TRPCError({
+          code: "UNAUTHORIZED",
+          message: "Access token not valid for this operation",
+        });
+      }
+      // update session
+      const updatedSession = await prisma.session.update({
         where: {
           id: input.sessionId,
         },
@@ -85,16 +103,30 @@ export const appRouter = trpc
           casks: true,
         },
       });
+      return exclude(updatedSession, "accessToken");
     },
   })
   .mutation("addCaskToSession", {
     input: z.object({
       sessionId: z.string(),
+      accessToken: z.string(),
       caskId: z.string(),
     }),
     async resolve({ input }) {
-      console.log({ input });
-      return prisma.session.update({
+      // check token
+      const findSession = await prisma.session.findFirst({
+        where: {
+          AND: [{ id: input.sessionId }, { accessToken: input.accessToken }],
+        },
+      });
+      if (!findSession) {
+        throw new trpc.TRPCError({
+          code: "UNAUTHORIZED",
+          message: "Access token not valid for this operation",
+        });
+      }
+      // update session
+      const updatedSession = await prisma.session.update({
         where: {
           id: input.sessionId,
         },
@@ -109,6 +141,7 @@ export const appRouter = trpc
           casks: true,
         },
       });
+      return exclude(updatedSession, "accessToken");
     },
   });
 
