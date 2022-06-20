@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
+import Select from "./Select";
 
 const ThemeToggle = () => {
   const [mounted, setMounted] = useState(false);
@@ -15,15 +16,11 @@ const ThemeToggle = () => {
   }
 
   return (
-    <select
-      value={theme}
-      onChange={(e) => setTheme(e.target.value)}
-      className="p-2 rounded-md border shadow-sm appearance-none w-max text-center"
-    >
+    <Select value={theme} onChange={(e) => setTheme(e.target.value)}>
       <option value="system">System</option>
       <option value="light">Light</option>
       <option value="dark">Dark</option>
-    </select>
+    </Select>
   );
 };
 

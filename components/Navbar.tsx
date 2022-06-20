@@ -30,7 +30,7 @@ const Navbar = () => {
   return (
     <div
       className={cx(
-        "sticky top-0 backdrop-blur-md p-4  border-b flex justify-between items-center flex-wrap gap-4 z-10 transition-all duration-75",
+        "sticky top-0 backdrop-blur-md p-4 flex justify-between items-center flex-wrap gap-4 z-10 transition-all duration-75 edges !border-x-0 !border-t-0 border-b !shadow-none",
         {
           "border-solid": showNavbarBorder,
           "border-none": !showNavbarBorder,
@@ -49,7 +49,7 @@ const Navbar = () => {
         </div>
         {/* bottom */}
         <div className="flex gap-8 items-center justify-between flex-wrap">
-          <div className="flex gap-8 items-center flex-wrap flex-1">
+          <div className="flex gap-8 items-center flex-wrap">
             <Search />
             <ThemeToggle />
             {/* <ToggleSelected /> */}
@@ -59,9 +59,7 @@ const Navbar = () => {
               <div className="w-4 h-4" />
             )}
           </div>
-          <div>
-            <Cart />
-          </div>
+          <Cart />
         </div>
       </div>
       {/* right */}

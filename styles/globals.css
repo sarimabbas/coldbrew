@@ -1,3 +1,19 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.material {
+  @apply bg-white dark:bg-black;
+}
+
+.surface {
+  @apply bg-white/60 dark:bg-gray-700/60 hover:bg-gray-50/60 hover:dark:bg-gray-800/60 dark:shadow-gray-400;
+}
+
+.edges {
+  @apply shadow-sm border dark:border-gray-500;
+}
+
+.chisel {
+  @apply rounded-md;
+}

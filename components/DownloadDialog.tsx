@@ -45,8 +45,8 @@ const DownloadDialog = (props: IDownloadDialogProps) => {
   return (
     <Dialog.Root open={isOpen} onOpenChange={(open) => setIsOpen(open)}>
       <Dialog.Portal>
-        <Dialog.Overlay className="bg-slate-300/50 dark:bg-slate-800/50 backdrop-blur-sm top-0 right-0 left-0 bottom-0 fixed grid place-items-center overflow-y-auto z-20">
-          <Dialog.Content className="shadow-lg p-4 border rounded-md z-30 min-w-[50%] max-w-[60%] bg-white dark:bg-black relative dark:border-gray-600">
+        <Dialog.Overlay className="surface backdrop-blur-sm top-0 right-0 left-0 bottom-0 fixed grid place-items-center overflow-y-auto z-20">
+          <Dialog.Content className="!shadow-lg p-4 z-30 min-w-[50%] max-w-[60%] material edges chisel relative">
             <Dialog.Title className="font-bold text-lg">Your apps</Dialog.Title>
             <Dialog.Description>
               Here&apos;s everything you have selected
@@ -56,7 +56,7 @@ const DownloadDialog = (props: IDownloadDialogProps) => {
             </Dialog.Close>
             {/* app grid */}
             <div
-              className="flex gap-4 overflow-x-scroll my-4 mb-8 py-1"
+              className="flex gap-4 overflow-x-auto my-4 mb-8 py-1"
               style={{}}
             >
               {session?.casks.map((c) => {
@@ -85,7 +85,7 @@ const DownloadDialog = (props: IDownloadDialogProps) => {
                 )}
               </button>
             </div>
-            <pre className="bg-slate-800 text-white p-4 rounded-md my-4 overflow-x-scroll">
+            <pre className="surface edges chisel p-4 my-4 overflow-x-auto">
               <code>{shellCommand}</code>
             </pre>
             <div className="text-sm">
@@ -114,7 +114,7 @@ const DownloadDialog = (props: IDownloadDialogProps) => {
                 )}
               </button>
             </div>
-            <pre className="bg-slate-800 text-white p-4 rounded-md mt-4 overflow-x-scroll">
+            <pre className="surface edges chisel p-4 mt-4 overflow-x-auto">
               <code>{shareLink}</code>
             </pre>
           </Dialog.Content>

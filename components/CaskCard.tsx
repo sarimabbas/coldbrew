@@ -26,13 +26,13 @@ const CaskCard = ({
         toggleSelected(cask);
       }}
       style={{
-        contentVisibility: "auto",
+        // contentVisibility: "auto",
         ...style,
       }}
       className={cx(
-        "h-full border shadow-sm p-4 rounded-md flex flex-col justify-between gap-4 cursor-pointer dark:border-gray-500 dark:shadow-gray-400 hover:bg-gray-50 hover:dark:bg-gray-800 transition-colors",
+        "h-full p-4 flex flex-col justify-between gap-4 cursor-pointer surface edges chisel",
         {
-          "border-yellow-300 shadow-yellow-300": isSelected,
+          "!border-blue-500 !shadow-blue-300": isSelected,
         },
         {
           "opacity-60": disabled,
@@ -42,7 +42,6 @@ const CaskCard = ({
     >
       <div className="flex gap-4 justify-between">
         <div>{cask.name || cask.id}</div>
-        {/* todo(sarim): make image take constant space */}
         {cask.logoUrl && (
           // eslint-disable-next-line @next/next/no-img-element
           <img
