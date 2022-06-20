@@ -46,7 +46,7 @@ const DownloadDialog = (props: IDownloadDialogProps) => {
     <Dialog.Root open={isOpen} onOpenChange={(open) => setIsOpen(open)}>
       <Dialog.Portal>
         <Dialog.Overlay className="surface backdrop-blur-sm top-0 right-0 left-0 bottom-0 fixed grid place-items-center overflow-y-auto z-20">
-          <Dialog.Content className="!shadow-lg p-4 z-30 min-w-[50%] max-w-[60%] material edges chisel relative">
+          <Dialog.Content className="!shadow-lg p-4 z-30 max-w-[90vw] md:min-w-[50vw] md:max-w-[60vw] material edges chisel relative">
             <Dialog.Title className="font-bold text-lg">Your apps</Dialog.Title>
             <Dialog.Description>
               Here&apos;s everything you have selected
