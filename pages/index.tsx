@@ -12,7 +12,7 @@ const Home: NextPage = () => {
   useCreateSession();
 
   const { searchQuery } = useSearch();
-  const [debouncedSearchQuery] = useDebounce(searchQuery, 80);
+  const [debouncedSearchQuery] = useDebounce(searchQuery, 500);
   const { data } = trpc.useQuery(["getCasks", { query: debouncedSearchQuery }]);
 
   console.log("casks:", data);

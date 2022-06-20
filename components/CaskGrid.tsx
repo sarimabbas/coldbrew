@@ -7,7 +7,7 @@ interface ICaskGridProps {
   casks: Cask[];
 }
 
-const CaskGrid = memo((props: ICaskGridProps) => {
+const CaskGrid = (props: ICaskGridProps) => {
   const { casks } = props;
   const { isCaskSelected, toggleSelectedCask } = useSession();
 
@@ -23,7 +23,7 @@ const CaskGrid = memo((props: ICaskGridProps) => {
       ))}
     </div>
   );
-});
+};
 
 CaskGrid.displayName = "CaskGrid";
 
