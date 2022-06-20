@@ -30,7 +30,9 @@ export const useCreateSession = () => {
 
   useEffect(() => {
     if (!sessionIdentifier) {
-      mutate();
+      // for some reason i had to pass null or it wouldn't work in prod
+      // https://github.com/trpc/trpc/issues/390
+      mutate(null);
     }
   }, [sessionIdentifier, mutate]);
 };
@@ -53,12 +55,10 @@ export const useSession = () => {
 
   const addCaskToSessionMutation = trpc.useMutation("addCaskToSession", {
     onMutate: async ({ sessionId, caskId }) => {
-      console.log("addcasktosession", { sessionId, caskId });
       mutationTracker.startOne();
       await queryClient.cancelQueries();
       const previousSession = getQueryData(["getSession", { sessionId }]);
       if (previousSession) {
-        console.log("updating cache directly");
         setQueryData(["getSession", { sessionId }], {
           ...previousSession,
           casks: [
@@ -69,7 +69,6 @@ export const useSession = () => {
             },
           ],
         });
-        console.log("updated cache!");
       }
       return { previousSession };
     },
