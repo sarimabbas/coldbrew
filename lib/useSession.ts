@@ -53,6 +53,7 @@ export const useSession = () => {
 
   const addCaskToSessionMutation = trpc.useMutation("addCaskToSession", {
     onMutate: async ({ sessionId, caskId }) => {
+      console.log("addcasktosession", { sessionId, caskId });
       mutationTracker.startOne();
       await queryClient.cancelQueries();
       const previousSession = getQueryData(["getSession", { sessionId }]);

@@ -93,6 +93,7 @@ export const appRouter = trpc
       caskId: z.string(),
     }),
     async resolve({ input }) {
+      console.log({ input });
       return prisma.session.update({
         where: {
           id: input.sessionId,
@@ -102,27 +103,6 @@ export const appRouter = trpc
             connect: {
               id: input.caskId,
             },
-          },
-        },
-        include: {
-          casks: true,
-        },
-      });
-    },
-  })
-  .mutation("setCasksOnSession", {
-    input: z.object({
-      sessionId: z.string(),
-      caskIds: z.string().array(),
-    }),
-    async resolve({ input }) {
-      return prisma.session.update({
-        where: {
-          id: input.sessionId,
-        },
-        data: {
-          casks: {
-            connect: input.caskIds.map((c) => ({ id: c })),
           },
         },
         include: {
