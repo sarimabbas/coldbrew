@@ -3,6 +3,7 @@ import Head from "next/head";
 import { useDebounce } from "use-debounce";
 import CaskGrid from "../components/CaskGrid";
 import DownloadDialog from "../components/DownloadDialog";
+import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
 import { trpc } from "../lib/trpc";
 import useSearch from "../lib/useSearch";
@@ -29,6 +30,7 @@ const Home: NextPage = () => {
       <DownloadDialog />
       <Navbar />
       <CaskGrid casks={data ?? []} />
+      <Footer />
     </div>
   );
 };

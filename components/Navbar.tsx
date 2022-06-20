@@ -5,7 +5,6 @@ import { useIsFetching } from "react-query";
 import Cart from "./Cart";
 import Search from "./Search";
 import ThemeToggle from "./ThemeToggle";
-import ToggleSelected from "./ToggleSelected";
 
 const Navbar = () => {
   const isFetching = useIsFetching();
