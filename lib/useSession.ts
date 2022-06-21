@@ -36,16 +36,18 @@ const createEmptyCask = (): Cask => ({
 });
 
 export const useCreateSession = () => {
-  const router = useRouter();
-  const sessionQueryParam = Array.isArray(router.query["session"])
-    ? router.query["session"]?.[0]
-    : router.query["session"];
+  const { invalidateQueries } = trpc.useContext();
 
   const [sessionIdentifier, setSessionIdentifier] = useAtom(
     sessionIdentifierAtom
   );
-  const setSessionAccessToken = useSetAtom(sessionAccessTokenAtom);
-  const { mutateAsync } = trpc.useMutation("createNewSession", {
+  const [sessionAccessToken, setSessionAccessToken] = useAtom(
+    sessionAccessTokenAtom
+  );
+
+  // create new session if it does not exist yet
+
+  const { mutate } = trpc.useMutation("createNewSession", {
     onSuccess: (data) => {
       setSessionIdentifier(data.id);
       setSessionAccessToken(data.accessToken ?? "");
@@ -53,20 +55,50 @@ export const useCreateSession = () => {
   });
 
   const createSessionCallback = useCallback(async () => {
-    // create new session if it does not exist yet
     if (!sessionIdentifier) {
-      await mutateAsync({
-        bootstrapWithExistingSessionId: sessionQueryParam,
-      });
-      // have to use Router instead of useRouter()
-      // because the latter is not a stable useEffect dependency
-      Router.push("/", undefined, { shallow: true });
+      mutate(null);
     }
-  }, [sessionIdentifier, mutateAsync, sessionQueryParam]);
+  }, [sessionIdentifier, mutate]);
 
   useEffect(() => {
     createSessionCallback();
   }, [createSessionCallback]);
+
+  // copy casks between sessions
+
+  const router = useRouter();
+  const sessionQueryParam = Array.isArray(router.query["session"])
+    ? router.query["session"]?.[0]
+    : router.query["session"];
+
+  const { mutate: copyCasksMutation } = trpc.useMutation(
+    "copyCasksBetweenSessions",
+    {
+      onSettled: async () => {
+        await invalidateQueries("getSession");
+        Router.push("/", undefined, { shallow: true });
+      },
+    }
+  );
+
+  const copyCasksCallback = useCallback(async () => {
+    if (sessionIdentifier && sessionQueryParam && sessionAccessToken) {
+      copyCasksMutation({
+        sourceSessionId: sessionQueryParam,
+        destinationSessionId: sessionIdentifier,
+        destinationSessionAccessToken: sessionAccessToken,
+      });
+    }
+  }, [
+    sessionIdentifier,
+    sessionQueryParam,
+    sessionAccessToken,
+    copyCasksMutation,
+  ]);
+
+  useEffect(() => {
+    copyCasksCallback();
+  }, [copyCasksCallback]);
 };
 
 export const useSession = () => {

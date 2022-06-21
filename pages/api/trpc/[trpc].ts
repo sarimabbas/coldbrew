@@ -61,28 +61,7 @@ export const appRouter = trpc
     },
   })
   .mutation("createNewSession", {
-    input: z.object({
-      bootstrapWithExistingSessionId: z.string().optional(),
-    }),
-    async resolve({ input }) {
-      // bootstrap from existing
-      if (input.bootstrapWithExistingSessionId) {
-        const existingSession = await prisma.session.findFirst({
-          where: {
-            id: input.bootstrapWithExistingSessionId,
-          },
-          include: {
-            casks: true,
-          },
-        });
-        return prisma.session.create({
-          data: {
-            casks: {
-              connect: existingSession?.casks.map((c) => ({ id: c.id })),
-            },
-          },
-        });
-      }
+    async resolve() {
       // start fresh
       return prisma.session.create({
         data: {},
@@ -163,6 +142,57 @@ export const appRouter = trpc
         },
       });
       return exclude(updatedSession, "accessToken");
+    },
+  })
+  .mutation("copyCasksBetweenSessions", {
+    input: z.object({
+      sourceSessionId: z.string(),
+      destinationSessionId: z.string(),
+      destinationSessionAccessToken: z.string(),
+    }),
+    async resolve({ input }) {
+      // source session
+      const sourceSession = await prisma.session.findFirst({
+        where: {
+          id: input.sourceSessionId,
+        },
+        include: {
+          casks: true,
+        },
+      });
+      if (!sourceSession) {
+        throw new trpc.TRPCError({
+          code: "NOT_FOUND",
+          message: "Source session not found",
+        });
+      }
+      const sourceCasks = sourceSession.casks;
+      // update destination session
+      const destinationSession = await prisma.session.findFirst({
+        where: {
+          AND: [
+            { id: input.destinationSessionId },
+            { accessToken: input.destinationSessionAccessToken },
+          ],
+        },
+      });
+      if (!destinationSession) {
+        throw new trpc.TRPCError({
+          code: "NOT_FOUND",
+          message: "Destination session not found",
+        });
+      }
+      const updatedDestinationSession = await prisma.session.update({
+        where: {
+          id: input.destinationSessionId,
+        },
+        data: {
+          casks: {
+            connect: sourceCasks.map((c) => ({ id: c.id })),
+          },
+        },
+      });
+      return exclude(updatedDestinationSession, "accessToken");
     },
   });
 
