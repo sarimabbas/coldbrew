@@ -6,7 +6,7 @@ import { useSession } from "../lib/useSession";
 const About = () => {
   const { session } = useSession();
   return (
-    <div className="container mx-auto p-4 prose prose-sm">
+    <div className="container mx-auto p-4 prose prose-sm dark:prose-invert">
       <Head>
         <title>Coldbrew - About</title>
       </Head>

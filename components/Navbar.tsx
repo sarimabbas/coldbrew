@@ -2,6 +2,7 @@ import { RefreshIcon } from "@heroicons/react/solid";
 import cx from "classnames";
 import { useCallback, useEffect, useState } from "react";
 import { useIsFetching } from "react-query";
+import AboutButton from "./AboutButton";
 import Cart from "./Cart";
 import Search from "./Search";
 import ThemeToggle from "./ThemeToggle";
@@ -40,7 +41,9 @@ const Navbar = () => {
       <div className="flex flex-col gap-4 flex-1">
         {/* text */}
         <div className="">
-          <h1 className="font-bold">Coldbrew</h1>
+          <div className="flex justify-between">
+            <h1 className="font-bold">Coldbrew</h1>
+          </div>
           <h2>
             A visual interface to quickly install your favorite macOS apps from
             Homebrew Cask
@@ -48,9 +51,10 @@ const Navbar = () => {
         </div>
         {/* bottom */}
         <div className="flex gap-8 items-center justify-between flex-wrap">
-          <div className="flex gap-8 items-center flex-wrap">
+          <div className="flex gap-4 items-center flex-wrap">
             <Search />
             <ThemeToggle />
+            <AboutButton />
             {/* <ToggleSelected /> */}
             {isFetching > 0 ? (
               <RefreshIcon className="h-4 animate-spin opacity-50" />

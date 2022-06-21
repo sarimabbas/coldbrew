@@ -94,7 +94,15 @@ const DownloadDialog = (props: IDownloadDialogProps) => {
                 <Link href={brewfileLink} target="_blank" rel="noreferrer">
                   Brewfile
                 </Link>
+                .{" "}
               </span>
+              If you experience an error, you might need to install{" "}
+              <span className="text-sky-500">
+                <a href="https://brew.sh" target="_blank" rel="noreferrer">
+                  Homebrew
+                </a>{" "}
+              </span>
+              first.
             </div>
             <div className="mb-8"></div>
             {/* share */}
