@@ -5,13 +5,13 @@ import CaskGrid from "../components/CaskGrid";
 import DownloadDialog from "../components/DownloadDialog";
 import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
+import SharedSessionInfo from "../components/SharedSessionInfo";
 import { trpc } from "../lib/trpc";
 import useSearch from "../lib/useSearch";
 import { useCreateSession } from "../lib/useSession";
 
 const Home: NextPage = () => {
-  useCreateSession();
-
+  const { sharedSessionId } = useCreateSession();
   const { searchQuery } = useSearch();
   const [debouncedSearchQuery] = useDebounce(searchQuery, 500);
   const { data } = trpc.useQuery(["getCasks", { query: debouncedSearchQuery }]);
@@ -27,7 +27,11 @@ const Home: NextPage = () => {
       </Head>
       <DownloadDialog />
       <Navbar />
-      <CaskGrid casks={data ?? []} />
+      {sharedSessionId ? (
+        <SharedSessionInfo />
+      ) : (
+        <CaskGrid casks={data ?? []} />
+      )}
       <Footer />
     </div>
   );

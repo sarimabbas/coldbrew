@@ -99,6 +99,10 @@ export const useCreateSession = () => {
   useEffect(() => {
     copyCasksCallback();
   }, [copyCasksCallback]);
+
+  return {
+    sharedSessionId: sessionQueryParam,
+  };
 };
 
 export const useSession = () => {
