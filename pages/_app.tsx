@@ -6,8 +6,6 @@ import { ReactQueryDevtools } from "react-query/devtools";
 import { httpLink } from "@trpc/client/links/httpLink";
 import { ThemeProvider } from "next-themes";
 
-console.log("trpc_server_url", process.env.TRPC_SERVER_URL);
-
 const MyApp: AppType = ({ Component, pageProps }) => {
   return (
     <ThemeProvider attribute="class">

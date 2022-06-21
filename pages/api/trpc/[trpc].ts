@@ -61,11 +61,32 @@ export const appRouter = trpc
     },
   })
   .mutation("createNewSession", {
-    async resolve({}) {
-      const session = await prisma.session.create({
+    input: z.object({
+      bootstrapWithExistingSessionId: z.string().optional(),
+    }),
+    async resolve({ input }) {
+      // bootstrap from existing
+      if (input.bootstrapWithExistingSessionId) {
+        const existingSession = await prisma.session.findFirst({
+          where: {
+            id: input.bootstrapWithExistingSessionId,
+          },
+          include: {
+            casks: true,
+          },
+        });
+        return prisma.session.create({
+          data: {
+            casks: {
+              connect: existingSession?.casks.map((c) => ({ id: c.id })),
+            },
+          },
+        });
+      }
+      // start fresh
+      return prisma.session.create({
         data: {},
       });
-      return session;
     },
   })
   .mutation("removeCaskFromSession", {

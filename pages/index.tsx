@@ -16,8 +16,6 @@ const Home: NextPage = () => {
   const [debouncedSearchQuery] = useDebounce(searchQuery, 500);
   const { data } = trpc.useQuery(["getCasks", { query: debouncedSearchQuery }]);
 
-  console.log("casks:", data);
-
   return (
     <div>
       <Head>

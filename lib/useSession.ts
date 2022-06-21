@@ -5,6 +5,7 @@ import { trpc } from "./trpc";
 import { Cask } from "@prisma/client";
 import { useMemo, useCallback } from "react";
 import { useTrackParallelMutations } from "./useTrackParallelMutations";
+import Router, { useRouter } from "next/router";
 
 // ----- SESSION STORAGE
 
@@ -35,24 +36,37 @@ const createEmptyCask = (): Cask => ({
 });
 
 export const useCreateSession = () => {
+  const router = useRouter();
+  const sessionQueryParam = Array.isArray(router.query["session"])
+    ? router.query["session"]?.[0]
+    : router.query["session"];
+
   const [sessionIdentifier, setSessionIdentifier] = useAtom(
     sessionIdentifierAtom
   );
   const setSessionAccessToken = useSetAtom(sessionAccessTokenAtom);
-  const { mutate } = trpc.useMutation("createNewSession", {
+  const { mutateAsync } = trpc.useMutation("createNewSession", {
     onSuccess: (data) => {
       setSessionIdentifier(data.id);
       setSessionAccessToken(data.accessToken ?? "");
     },
   });
 
-  useEffect(() => {
+  const createSessionCallback = useCallback(async () => {
+    // create new session if it does not exist yet
     if (!sessionIdentifier) {
-      // for some reason i had to pass null or it wouldn't work in prod
-      // https://github.com/trpc/trpc/issues/390
-      mutate(null);
+      await mutateAsync({
+        bootstrapWithExistingSessionId: sessionQueryParam,
+      });
+      // have to use Router instead of useRouter()
+      // because the latter is not a stable useEffect dependency
+      Router.push("/", undefined, { shallow: true });
     }
-  }, [sessionIdentifier, mutate]);
+  }, [sessionIdentifier, mutateAsync, sessionQueryParam]);
+
+  useEffect(() => {
+    createSessionCallback();
+  }, [createSessionCallback]);
 };
 
 export const useSession = () => {
