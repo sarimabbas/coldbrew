@@ -68,8 +68,10 @@ export const getCasks = async (): Promise<IGetCasks> => {
   // update the casks with details
   items.forEach((item) => {
     item.homepage = detailMap[item.cask]?.homepage ?? null;
-    item.logo = `https://logo.clearbit.com/${detailMap[item.cask]?.homepage}`;
     item.name = detailMap[item.cask]?.name?.[0] ?? null;
+    if (item.homepage) {
+      item.logo = `https://logo.clearbit.com/${detailMap[item.cask]?.homepage}`;
+    }
   });
 
   return {
