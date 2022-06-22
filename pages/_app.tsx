@@ -5,8 +5,17 @@ import { AppRouter } from "./api/trpc/[trpc]";
 import { ReactQueryDevtools } from "react-query/devtools";
 import { httpLink } from "@trpc/client/links/httpLink";
 import { ThemeProvider } from "next-themes";
+import splitbee from "@splitbee/web";
+import { useEffect } from "react";
 
 const MyApp: AppType = ({ Component, pageProps }) => {
+  useEffect((): void => {
+    splitbee.init({
+      scriptUrl: "/bee.js",
+      apiUrl: "/_hive",
+    });
+  }, []);
+
   return (
     <ThemeProvider attribute="class">
       <Component {...pageProps} />
