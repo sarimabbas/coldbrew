@@ -1,4 +1,5 @@
 import Head from "next/head";
+import Link from "next/link";
 import React from "react";
 import SessionPill from "../components/SessionPill";
 import { useSession } from "../lib/useSession";
@@ -6,15 +7,18 @@ import { useSession } from "../lib/useSession";
 const About = () => {
   const { session } = useSession();
   return (
-    <div className="container mx-auto p-4 prose prose-sm dark:prose-invert">
+    <div className="container mx-auto p-4 prose prose-sm dark:prose-invert prose-a:underline-offset-4">
       <Head>
         <title>Coldbrew - About</title>
       </Head>
       <h3>About Coldbrew</h3>
       <p>
-        Coldbrew is a hobby project by me, @sarimabbas 👋. For the longest time,
-        I&apos;ve wanted a visual, one-click tool to install all the apps I
-        want.
+        Coldbrew is a hobby project by me,{" "}
+        <Link href="https://twitter.com/Sarim__Abbas" passHref>
+          <a>@Sarim__Abbas</a>
+        </Link>{" "}
+        👋. For the longest time, I&apos;ve wanted a visual, one-click tool to
+        install all the apps I want.
       </p>
       <p>
         So I built Coldbrew! You can select all the apps you want, and Coldbrew
