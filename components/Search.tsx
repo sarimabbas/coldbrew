@@ -1,4 +1,6 @@
 import { SearchIcon } from "@heroicons/react/solid";
+import splitbee from "@splitbee/web";
+import { SplitbeeEvents } from "../lib/analytics";
 import useSearch from "../lib/useSearch";
 
 const Search = () => {
@@ -10,6 +12,7 @@ const Search = () => {
       <input
         type="text"
         className="w-fit px-4 py-2 pl-10 surface edges rounded-full"
+        onFocus={() => splitbee.track(SplitbeeEvents.ClickedSearch)}
         onChange={(e) => setSearchQuery(e.currentTarget.value.toLowerCase())}
       />
     </div>

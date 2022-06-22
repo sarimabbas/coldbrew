@@ -4,8 +4,10 @@ import {
   XCircleIcon,
 } from "@heroicons/react/solid";
 import * as Dialog from "@radix-ui/react-dialog";
+import splitbee from "@splitbee/web";
 import { useAtom } from "jotai";
 import Link from "next/link";
+import { SplitbeeEvents } from "../lib/analytics";
 import { showDownloadDialogAtom } from "../lib/store";
 import useClipboard from "../lib/useClipboard";
 import { useSession } from "../lib/useSession";
@@ -77,7 +79,12 @@ const DownloadDialog = (props: IDownloadDialogProps) => {
                 <div className="font-bold">Download</div>
                 <div>Run the command below in your Terminal</div>
               </div>
-              <button onClick={() => copyShellCommand()}>
+              <button
+                onClick={() => {
+                  splitbee.track(SplitbeeEvents.ClickedCopyDownload);
+                  copyShellCommand();
+                }}
+              >
                 {copyShellCommandHot ? (
                   <CheckCircleIcon className="h-8" />
                 ) : (
@@ -114,7 +121,12 @@ const DownloadDialog = (props: IDownloadDialogProps) => {
                   later
                 </div>
               </div>
-              <button onClick={() => copyShareLink()}>
+              <button
+                onClick={() => {
+                  splitbee.track(SplitbeeEvents.ClickedCopyShare);
+                  copyShareLink();
+                }}
+              >
                 {copyShareLinkHot ? (
                   <CheckCircleIcon className="h-8" />
                 ) : (

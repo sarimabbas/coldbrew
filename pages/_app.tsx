@@ -11,6 +11,7 @@ import { useEffect } from "react";
 const MyApp: AppType = ({ Component, pageProps }) => {
   useEffect((): void => {
     splitbee.init({
+      token: process.env.NEXT_PUBLIC_SPLITBEE_TOKEN,
       scriptUrl: "/bee.js",
       apiUrl: "/_hive",
     });

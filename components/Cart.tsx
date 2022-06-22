@@ -1,5 +1,7 @@
 import { InboxInIcon } from "@heroicons/react/solid";
+import splitbee from "@splitbee/web";
 import { useSetAtom } from "jotai";
+import { SplitbeeEvents } from "../lib/analytics";
 import { showDownloadDialogAtom } from "../lib/store";
 import { useSession } from "../lib/useSession";
 import Button from "./Button";
@@ -13,6 +15,9 @@ const Cart = () => {
     <Button
       disabled={selectedCasks.length < 1}
       onClick={() => {
+        splitbee.track(SplitbeeEvents.ClickedCart, {
+          numberOfCasks: selectedCasks.length,
+        });
         if (selectedCasks.length < 1) return;
         showDownloadDialog(true);
       }}
