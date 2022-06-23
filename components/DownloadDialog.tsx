@@ -92,13 +92,23 @@ const DownloadDialog = (props: IDownloadDialogProps) => {
                 )}
               </button>
             </div>
-            <pre className="surface edges chisel p-4 my-4 overflow-x-auto">
+            <pre
+              className="surface edges chisel p-4 my-4 overflow-x-auto"
+              onClick={() => splitbee.track(SplitbeeEvents.ClickedLinkDownload)}
+            >
               <code>{shellCommand}</code>
             </pre>
             <div className="text-sm">
               Or just download the{" "}
               <span className="text-sky-500">
-                <Link href={brewfileLink} target="_blank" rel="noreferrer">
+                <Link
+                  href={brewfileLink}
+                  target="_blank"
+                  rel="noreferrer"
+                  onClick={() =>
+                    splitbee.track(SplitbeeEvents.ClickedLinkBrewfile)
+                  }
+                >
                   Brewfile
                 </Link>
                 .{" "}
@@ -134,7 +144,10 @@ const DownloadDialog = (props: IDownloadDialogProps) => {
                 )}
               </button>
             </div>
-            <pre className="surface edges chisel p-4 mt-4 overflow-x-auto">
+            <pre
+              className="surface edges chisel p-4 mt-4 overflow-x-auto"
+              onClick={() => splitbee.track(SplitbeeEvents.ClickedLinkShare)}
+            >
               <code>{shareLink}</code>
             </pre>
           </Dialog.Content>
