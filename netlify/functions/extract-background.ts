@@ -17,7 +17,6 @@ export const handler: Handler = async (event) => {
         homepage: c.homepage,
         installCount: c.count,
         installPercent: c.percent,
-        logoUrl: c.logo,
         ranking: c.number,
       };
       return prisma.cask.upsert({
@@ -26,6 +25,7 @@ export const handler: Handler = async (event) => {
         },
         create: {
           id: c.cask,
+          logoUrl: c.logo,
           ...patch,
         },
         update: patch,
