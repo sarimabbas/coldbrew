@@ -60,7 +60,15 @@ const About = () => {
       <p>
         You can share the link to your session with someone else. When they
         visit the share link, every app linked to your session will be copied
-        over to a new session for them.
+        over to a new session for them. Here are{" "}
+        <a
+          href="https://coldbrew.doom.sh/?session=693569b2-5680-45c0-a361-534f8621cbbc"
+          target="_blank"
+          rel="noreferrer"
+        >
+          some of my favorites
+        </a>
+        !
       </p>
       <p>
         Oh also, you should know that I collect page-view data with Splitbee
