@@ -1,11 +1,11 @@
-import { RefreshIcon } from "@heroicons/react/solid";
+import { ArrowPathIcon } from "@heroicons/react/24/solid";
 import React from "react";
 
 const SharedSessionInfo = () => {
   return (
-    <div className="p-4 flex flex-col items-center gap-8 justify-center">
+    <div className="flex flex-col items-center justify-center gap-8 p-4">
       <div>Creating a new session with apps shared with you.</div>
-      <RefreshIcon className="h-4 animate-spin opacity-50" />
+      <ArrowPathIcon className="h-4 opacity-50 animate-spin" />
     </div>
   );
 };

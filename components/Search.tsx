@@ -1,4 +1,4 @@
-import { SearchIcon } from "@heroicons/react/solid";
+import { MagnifyingGlassIcon } from "@heroicons/react/24/solid";
 import splitbee from "@splitbee/web";
 import { SplitbeeEvents } from "../lib/analytics";
 import useSearch from "../lib/useSearch";
@@ -7,11 +7,11 @@ const Search = () => {
   const { setSearchQuery } = useSearch();
 
   return (
-    <div className="flex gap-2 items-center relative flex-1">
-      <SearchIcon className="h-4 z-20 absolute left-4" />
+    <div className="relative flex items-center flex-1 gap-2">
+      <MagnifyingGlassIcon className="absolute z-20 h-4 left-4" />
       <input
         type="text"
-        className="w-fit px-4 py-2 pl-10 surface edges rounded-full"
+        className="px-4 py-2 pl-10 rounded-full w-fit surface edges"
         onFocus={() => splitbee.track(SplitbeeEvents.ClickedSearch)}
         onChange={(e) => setSearchQuery(e.currentTarget.value.toLowerCase())}
       />

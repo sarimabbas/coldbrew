@@ -1,4 +1,4 @@
-import { RefreshIcon } from "@heroicons/react/solid";
+import { ArrowPathIcon } from "@heroicons/react/24/solid";
 import cx from "classnames";
 import { useCallback, useEffect, useState } from "react";
 import { useIsFetching } from "react-query";
@@ -38,7 +38,7 @@ const Navbar = () => {
       )}
     >
       {/* left */}
-      <div className="flex flex-col gap-4 flex-1">
+      <div className="flex flex-col flex-1 gap-4">
         {/* text */}
         <div className="">
           <div className="flex justify-between">
@@ -50,14 +50,14 @@ const Navbar = () => {
           </h2>
         </div>
         {/* bottom */}
-        <div className="flex gap-8 items-center justify-between flex-wrap">
-          <div className="flex gap-4 items-center flex-wrap">
+        <div className="flex flex-wrap items-center justify-between gap-8">
+          <div className="flex flex-wrap items-center gap-4">
             <Search />
             <ThemeToggle />
             <AboutButton />
             {/* <ToggleSelected /> */}
             {isFetching > 0 ? (
-              <RefreshIcon className="h-4 animate-spin opacity-50" />
+              <ArrowPathIcon className="h-4 opacity-50 animate-spin" />
             ) : (
               <div className="w-4 h-4" />
             )}

@@ -1,8 +1,8 @@
 import {
   CheckCircleIcon,
-  ClipboardCopyIcon,
+  ClipboardDocumentIcon,
   XCircleIcon,
-} from "@heroicons/react/solid";
+} from "@heroicons/react/24/solid";
 import * as Dialog from "@radix-ui/react-dialog";
 import splitbee from "@splitbee/web";
 import { useAtom } from "jotai";
@@ -47,9 +47,9 @@ const DownloadDialog = (props: IDownloadDialogProps) => {
   return (
     <Dialog.Root open={isOpen} onOpenChange={(open) => setIsOpen(open)}>
       <Dialog.Portal>
-        <Dialog.Overlay className="surface backdrop-blur-sm top-0 right-0 left-0 bottom-0 fixed grid place-items-center overflow-y-auto z-20">
+        <Dialog.Overlay className="fixed top-0 bottom-0 left-0 right-0 z-20 grid overflow-y-auto surface backdrop-blur-sm place-items-center">
           <Dialog.Content className="!shadow-lg p-4 z-30 max-w-[90vw] md:min-w-[50vw] md:max-w-[60vw] material edges chisel relative">
-            <Dialog.Title className="font-bold text-lg">Your apps</Dialog.Title>
+            <Dialog.Title className="text-lg font-bold">Your apps</Dialog.Title>
             <Dialog.Description>
               Here&apos;s everything you have selected
             </Dialog.Description>
@@ -58,12 +58,12 @@ const DownloadDialog = (props: IDownloadDialogProps) => {
             </Dialog.Close>
             {/* app grid */}
             <div
-              className="flex gap-4 overflow-x-auto my-4 mb-8 py-1"
+              className="flex gap-4 py-1 my-4 mb-8 overflow-x-auto"
               style={{}}
             >
               {session?.casks.map((c) => {
                 return (
-                  <div className=" flex-shrink-0" key={c.id}>
+                  <div className="flex-shrink-0 " key={c.id}>
                     <CaskCard
                       cask={c}
                       isSelected={isCaskSelected(c)}
@@ -88,12 +88,12 @@ const DownloadDialog = (props: IDownloadDialogProps) => {
                 {copyShellCommandHot ? (
                   <CheckCircleIcon className="h-8" />
                 ) : (
-                  <ClipboardCopyIcon className="h-8" />
+                  <ClipboardDocumentIcon className="h-8" />
                 )}
               </button>
             </div>
             <pre
-              className="surface edges chisel p-4 my-4 overflow-x-auto"
+              className="p-4 my-4 overflow-x-auto surface edges chisel"
               onClick={() => splitbee.track(SplitbeeEvents.ClickedLinkDownload)}
             >
               <code>{shellCommand}</code>
@@ -140,12 +140,12 @@ const DownloadDialog = (props: IDownloadDialogProps) => {
                 {copyShareLinkHot ? (
                   <CheckCircleIcon className="h-8" />
                 ) : (
-                  <ClipboardCopyIcon className="h-8" />
+                  <ClipboardDocumentIcon className="h-8" />
                 )}
               </button>
             </div>
             <pre
-              className="surface edges chisel p-4 mt-4 overflow-x-auto"
+              className="p-4 mt-4 overflow-x-auto surface edges chisel"
               onClick={() => splitbee.track(SplitbeeEvents.ClickedLinkShare)}
             >
               <code>{shareLink}</code>
