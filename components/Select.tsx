@@ -8,7 +8,8 @@ const Select: React.FC<SelectProps> = ({ children, ...delegated }) => {
     <select
       {...delegated}
       className={cx(
-        "appearance-none text-center relative p-2 surface edges chisel"
+        "appearance-none text-center relative p-2 surface edges chisel",
+        delegated.className
       )}
     >
       {children}

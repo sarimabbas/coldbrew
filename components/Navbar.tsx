@@ -53,7 +53,6 @@ const Navbar = () => {
         <div className="flex flex-wrap items-center justify-between gap-8">
           <div className="flex flex-wrap items-center gap-4">
             <Search />
-            <ThemeToggle />
             <AboutButton />
             {/* <ToggleSelected /> */}
             {isFetching > 0 ? (
