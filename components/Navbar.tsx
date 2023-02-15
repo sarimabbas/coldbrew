@@ -5,7 +5,6 @@ import { useIsFetching } from "react-query";
 import AboutButton from "./AboutButton";
 import Cart from "./Cart";
 import Search from "./Search";
-import ThemeToggle from "./ThemeToggle";
 
 const Navbar = () => {
   const isFetching = useIsFetching();

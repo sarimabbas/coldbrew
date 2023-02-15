@@ -7,7 +7,7 @@ import { NextApiHandler } from "next";
 
 const limit = pLimit(10);
 
-// this is called by Upstash QStash on a cron schedule
+// this is called on a schedule
 const handler: NextApiHandler = async () => {
   const { casksList } = await getCasks();
 
