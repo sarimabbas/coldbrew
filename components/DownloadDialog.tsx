@@ -19,11 +19,11 @@ const DownloadDialog = (props: IDownloadDialogProps) => {
   const { session, isCaskSelected, toggleSelectedCask } = useSession();
   const [isOpen, setIsOpen] = useAtom(showDownloadDialogAtom);
 
-  const shellCommand = `curl -sSL ${
+  const shellCommand = `curl -sSL "${
     process.env.NODE_ENV === "development"
       ? "http://localhost:3000/"
       : "https://coldbrew.doom.sh/"
-  }api/download?session=${encodeURIComponent(session?.id ?? "")} | sh`;
+  }api/download?session=${encodeURIComponent(session?.id ?? "")}" | sh`;
 
   const brewfileLink = `${
     process.env.NODE_ENV === "development"
