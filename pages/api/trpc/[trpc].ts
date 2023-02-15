@@ -25,6 +25,20 @@ export const appRouter = trpc
       return null;
     },
   })
+  .query("getLastUpdated", {
+    async resolve({}) {
+      const lastUpdatedCask = await prisma.cask.findMany({
+        take: 1,
+        orderBy: {
+          updatedAt: "desc",
+        },
+      });
+      if (lastUpdatedCask.length < 1) {
+        return undefined;
+      }
+      return lastUpdatedCask[0].updatedAt;
+    },
+  })
   .query("getCasks", {
     input: z.object({
       query: z.string().optional(),
