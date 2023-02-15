@@ -16,10 +16,14 @@ const ThemeToggle = () => {
   }
 
   return (
-    <Select value={theme} onChange={(e) => setTheme(e.target.value)}>
-      <option value="system">System</option>
-      <option value="light">Light</option>
-      <option value="dark">Dark</option>
+    <Select
+      value={theme}
+      onChange={(e) => setTheme(e.target.value)}
+      className="px-2 py-1 text-sm"
+    >
+      <option value="system">Theme: System</option>
+      <option value="light">Theme: Light</option>
+      <option value="dark">Theme: Dark</option>
     </Select>
   );
 };

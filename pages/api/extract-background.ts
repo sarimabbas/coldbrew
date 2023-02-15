@@ -1,13 +1,14 @@
 // extracts cask data from homebrew api and stores it in the database
-import { Handler } from "@netlify/functions";
 import { getCasks } from "../../lib";
 import { prisma } from "../../lib/db";
 import pLimit from "p-limit";
 import { Cask } from "@prisma/client";
+import { NextApiHandler } from "next";
 
 const limit = pLimit(10);
 
-export const handler: Handler = async (event) => {
+// this is called on a schedule
+const handler: NextApiHandler = async () => {
   const { casksList } = await getCasks();
 
   const rateLimitedPromises = casksList.map((c) =>
@@ -38,4 +39,10 @@ export const handler: Handler = async (event) => {
   return {
     statusCode: 200,
   };
+};
+
+export default handler;
+
+export const config = {
+  cron: "0 9 * * *",
 };

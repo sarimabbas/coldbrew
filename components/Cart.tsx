@@ -1,4 +1,4 @@
-import { InboxInIcon } from "@heroicons/react/solid";
+import { InboxIcon } from "@heroicons/react/24/solid";
 import splitbee from "@splitbee/web";
 import { useSetAtom } from "jotai";
 import { SplitbeeEvents } from "../lib/analytics";
@@ -23,13 +23,13 @@ const Cart = () => {
       }}
     >
       {selectedCasks.length > 0 && (
-        <div className="absolute top-0 right-0 h-6 w-6 px-1 bg-red-600 rounded-full text-white font-mono flex items-center justify-center text-xs translate-x-3 -translate-y-3 shadow-md">
+        <div className="absolute top-0 right-0 flex items-center justify-center w-6 h-6 px-1 font-mono text-xs text-white translate-x-3 -translate-y-3 bg-red-600 rounded-full shadow-md">
           {selectedCasks.length}
         </div>
       )}
-      <div className="flex gap-2 items-center">
+      <div className="flex items-center gap-2">
         <div>Your apps</div>
-        <InboxInIcon className={"h-5"} />
+        <InboxIcon className={"h-5"} />
       </div>
     </Button>
   );
