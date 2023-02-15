@@ -15,6 +15,7 @@ specifiers:
   '@types/node': ^18.13.0
   '@types/react': 18.0.27
   '@types/react-dom': 18.0.10
+  '@vercel/analytics': ^0.1.8
   autoprefixer: ^10.4.7
   babel-plugin-superjson-next: ^0.4.3
   bunnygram: ^1.0.0
@@ -47,6 +48,7 @@ dependencies:
   '@trpc/next': 9.27.3_7techqwrh3i4o7cp5glcm3o67i
   '@trpc/react': 9.27.4_ad222gtnw5urvu3k6qftesms7e
   '@trpc/server': 9.27.3
+  '@vercel/analytics': 0.1.8_react@18.2.0
   babel-plugin-superjson-next: 0.4.5_6hb7bebdisxcpyppymkqpiq3a4
   bunnygram: 1.0.0
   classnames: 2.3.2
@@ -743,6 +745,14 @@ packages:
     resolution: {integrity: sha512-M3flEZueu5eKhmqZAn8dT9Cp5wC5OePyD0lwreVLSsj60oqy77DtoLUasttLnnJiDS18wdXFi6Sg0ZO8en2e0w==}
     dependencies:
       '@deno/shim-crypto': 0.3.1
+    dev: false
+
+  /@vercel/analytics/0.1.8_react@18.2.0:
+    resolution: {integrity: sha512-PQrOI8BJ9qUiVJuQfnKiJd15eDjDJH9TBKsNeMrtelT4NAk7d9mBVz1CoZkvoFnHQ0OW7Xnqmr1F2nScfAnznQ==}
+    peerDependencies:
+      react: ^16.8||^17||^18
+    dependencies:
+      react: 18.2.0
     dev: false
 
   /acorn-jsx/5.3.2_acorn@8.8.2:

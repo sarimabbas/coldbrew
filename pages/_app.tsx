@@ -7,6 +7,7 @@ import { httpLink } from "@trpc/client/links/httpLink";
 import { ThemeProvider } from "next-themes";
 import splitbee from "@splitbee/web";
 import { useEffect } from "react";
+import { Analytics } from "@vercel/analytics/react";
 
 const MyApp: AppType = ({ Component, pageProps }) => {
   useEffect((): void => {
@@ -20,6 +21,7 @@ const MyApp: AppType = ({ Component, pageProps }) => {
   return (
     <ThemeProvider attribute="class">
       <Component {...pageProps} />
+      <Analytics />
       {process.env.NODE_ENV !== "production" && (
         <ReactQueryDevtools initialIsOpen={false} />
       )}
