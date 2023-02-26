@@ -42,7 +42,3 @@ const handler: NextApiHandler = async () => {
 };
 
 export default handler;
-
-export const config = {
-  cron: "0 9 * * *",
-};

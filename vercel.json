@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/extract-background",
+      "schedule": "0 10 * * *"
+    }
+  ]
+}
