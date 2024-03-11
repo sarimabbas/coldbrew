@@ -14,9 +14,9 @@ const About = () => {
       <h3>About Coldbrew</h3>
       <p>
         Coldbrew is a hobby project by me,{" "}
-        <Link href="https://twitter.com/Sarim__Abbas">@Sarim__Abbas</Link> 👋.
-        For the longest time, I&apos;ve wanted a visual, one-click tool to
-        install all the apps I want.
+        <Link href="https://twitter.com/sarim_ok">@sarim_ok</Link> 👋. For the
+        longest time, I&apos;ve wanted a visual, one-click tool to install all
+        the apps I want.
       </p>
       <p>
         So I built Coldbrew! You can select all the apps you want, and Coldbrew
@@ -58,15 +58,7 @@ const About = () => {
       <p>
         You can share the link to your session with someone else. When they
         visit the share link, every app linked to your session will be copied
-        over to a new session for them. Here are{" "}
-        <a
-          href="https://coldbrew.vercel.app/?session=693569b2-5680-45c0-a361-534f8621cbbc"
-          target="_blank"
-          rel="noreferrer"
-        >
-          some of my favorites
-        </a>
-        !
+        over to a new session for them.
       </p>
       <p>
         Oh also, you should know that I collect page-view data with Vercel
@@ -75,7 +67,7 @@ const About = () => {
       <h3>Built with</h3>
       <p>
         Coldbrew was built with the Homebrew API, the results of which are
-        stored in a Supabase database. The data is queried by a NextJS app with
+        stored in a Neon database. The data is queried by a NextJS app with
         React Query and TRPC. The app is styled with Tailwind.
       </p>
     </div>
