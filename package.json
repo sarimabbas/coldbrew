@@ -3,13 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "doppler run -- next dev",
+    "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "prisma:push": "doppler run -- npx prisma db push",
-    "prisma:generate": "doppler run -- npx prisma generate",
-    "prisma:studio": "doppler run -- npx prisma studio",
+    "prisma:push": "npx prisma db push",
+    "prisma:generate": "npx prisma generate",
+    "prisma:studio": "npx prisma studio",
     "prisma:ci": "npx prisma generate"
   },
   "dependencies": {
