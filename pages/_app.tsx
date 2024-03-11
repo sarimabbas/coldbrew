@@ -6,10 +6,14 @@ import { AppType } from "next/dist/shared/lib/utils";
 import { ReactQueryDevtools } from "react-query/devtools";
 import "../styles/globals.css";
 import { AppRouter } from "./api/trpc/[trpc]";
+import Head from "next/head";
 
 const MyApp: AppType = ({ Component, pageProps }) => {
   return (
     <ThemeProvider attribute="class">
+      <Head>
+        <link rel="icon" type="image/png" href="/favicon.png" />
+      </Head>
       <Component {...pageProps} />
       <Analytics />
       {process.env.NODE_ENV !== "production" && (
