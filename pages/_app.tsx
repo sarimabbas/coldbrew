@@ -1,23 +1,13 @@
-import "../styles/globals.css";
-import { withTRPC } from "@trpc/next";
-import { AppType } from "next/dist/shared/lib/utils";
-import { AppRouter } from "./api/trpc/[trpc]";
-import { ReactQueryDevtools } from "react-query/devtools";
 import { httpLink } from "@trpc/client/links/httpLink";
-import { ThemeProvider } from "next-themes";
-import splitbee from "@splitbee/web";
-import { useEffect } from "react";
+import { withTRPC } from "@trpc/next";
 import { Analytics } from "@vercel/analytics/react";
+import { ThemeProvider } from "next-themes";
+import { AppType } from "next/dist/shared/lib/utils";
+import { ReactQueryDevtools } from "react-query/devtools";
+import "../styles/globals.css";
+import { AppRouter } from "./api/trpc/[trpc]";
 
 const MyApp: AppType = ({ Component, pageProps }) => {
-  useEffect((): void => {
-    splitbee.init({
-      token: process.env.NEXT_PUBLIC_SPLITBEE_TOKEN,
-      scriptUrl: "/bee.js",
-      apiUrl: "/_hive",
-    });
-  }, []);
-
   return (
     <ThemeProvider attribute="class">
       <Component {...pageProps} />

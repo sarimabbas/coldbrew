@@ -1,5 +1,5 @@
 import { MagnifyingGlassIcon } from "@heroicons/react/24/solid";
-import splitbee from "@splitbee/web";
+import { track } from "@vercel/analytics";
 import { SplitbeeEvents } from "../lib/analytics";
 import useSearch from "../lib/useSearch";
 
@@ -12,7 +12,7 @@ const Search = () => {
       <input
         type="text"
         className="px-4 py-2 pl-10 rounded-full w-fit surface edges"
-        onFocus={() => splitbee.track(SplitbeeEvents.ClickedSearch)}
+        onFocus={() => track(SplitbeeEvents.ClickedSearch)}
         onChange={(e) => setSearchQuery(e.currentTarget.value.toLowerCase())}
       />
     </div>

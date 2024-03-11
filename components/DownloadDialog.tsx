@@ -4,7 +4,7 @@ import {
   XCircleIcon,
 } from "@heroicons/react/24/solid";
 import * as Dialog from "@radix-ui/react-dialog";
-import splitbee from "@splitbee/web";
+import { track } from "@vercel/analytics";
 import { useAtom } from "jotai";
 import Link from "next/link";
 import { SplitbeeEvents } from "../lib/analytics";
@@ -81,7 +81,7 @@ const DownloadDialog = (props: IDownloadDialogProps) => {
               </div>
               <button
                 onClick={() => {
-                  splitbee.track(SplitbeeEvents.ClickedCopyDownload);
+                  track(SplitbeeEvents.ClickedCopyDownload);
                   copyShellCommand();
                 }}
               >
@@ -94,7 +94,7 @@ const DownloadDialog = (props: IDownloadDialogProps) => {
             </div>
             <pre
               className="p-4 my-4 overflow-x-auto surface edges chisel"
-              onClick={() => splitbee.track(SplitbeeEvents.ClickedLinkDownload)}
+              onClick={() => track(SplitbeeEvents.ClickedLinkDownload)}
             >
               <code>{shellCommand}</code>
             </pre>
@@ -105,9 +105,7 @@ const DownloadDialog = (props: IDownloadDialogProps) => {
                   href={brewfileLink}
                   target="_blank"
                   rel="noreferrer"
-                  onClick={() =>
-                    splitbee.track(SplitbeeEvents.ClickedLinkBrewfile)
-                  }
+                  onClick={() => track(SplitbeeEvents.ClickedLinkBrewfile)}
                 >
                   Brewfile
                 </Link>
@@ -133,7 +131,7 @@ const DownloadDialog = (props: IDownloadDialogProps) => {
               </div>
               <button
                 onClick={() => {
-                  splitbee.track(SplitbeeEvents.ClickedCopyShare);
+                  track(SplitbeeEvents.ClickedCopyShare);
                   copyShareLink();
                 }}
               >
@@ -146,7 +144,7 @@ const DownloadDialog = (props: IDownloadDialogProps) => {
             </div>
             <pre
               className="p-4 mt-4 overflow-x-auto surface edges chisel"
-              onClick={() => splitbee.track(SplitbeeEvents.ClickedLinkShare)}
+              onClick={() => track(SplitbeeEvents.ClickedLinkShare)}
             >
               <code>{shareLink}</code>
             </pre>
