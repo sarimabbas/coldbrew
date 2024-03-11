@@ -60,7 +60,7 @@ const About = () => {
         visit the share link, every app linked to your session will be copied
         over to a new session for them. Here are{" "}
         <a
-          href="https://coldbrew.doom.sh/?session=693569b2-5680-45c0-a361-534f8621cbbc"
+          href="https://coldbrew.vercel.app/?session=693569b2-5680-45c0-a361-534f8621cbbc"
           target="_blank"
           rel="noreferrer"
         >

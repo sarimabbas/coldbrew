@@ -22,19 +22,19 @@ const DownloadDialog = (props: IDownloadDialogProps) => {
   const shellCommand = `curl -sSL "${
     process.env.NODE_ENV === "development"
       ? "http://localhost:3000/"
-      : "https://coldbrew.doom.sh/"
+      : "https://coldbrew.vercel.app/"
   }api/download?session=${encodeURIComponent(session?.id ?? "")}" | sh`;
 
   const brewfileLink = `${
     process.env.NODE_ENV === "development"
       ? "http://localhost:3000/"
-      : "https://coldbrew.doom.sh/"
+      : "https://coldbrew.vercel.app/"
   }api/download?session=${encodeURIComponent(session?.id ?? "")}&file=true`;
 
   const shareLink = `${
     process.env.NODE_ENV === "development"
       ? "http://localhost:3000/"
-      : "https://coldbrew.doom.sh/"
+      : "https://coldbrew.vercel.app/"
   }?session=${encodeURIComponent(session?.id ?? "")}`;
 
   const { copyText: copyShellCommand, isHot: copyShellCommandHot } =
