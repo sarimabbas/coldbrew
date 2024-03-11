@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import { ArrowPathIcon } from "@heroicons/react/24/solid";
 import cx from "classnames";
 import { useCallback, useEffect, useState } from "react";
@@ -39,14 +40,17 @@ const Navbar = () => {
       {/* left */}
       <div className="flex flex-col flex-1 gap-4">
         {/* text */}
-        <div className="">
-          <div className="flex justify-between">
-            <h1 className="font-bold">Coldbrew</h1>
+        <div className="flex items-center gap-4">
+          <img src="/favicon.png" alt="Coldbrew" className="w-8 h-8" />
+          <div className="">
+            <div className="flex justify-between">
+              <h1 className="font-bold">Coldbrew</h1>
+            </div>
+            <h2>
+              A visual interface to quickly install your favorite macOS apps
+              from Homebrew Cask
+            </h2>
           </div>
-          <h2>
-            A visual interface to quickly install your favorite macOS apps from
-            Homebrew Cask
-          </h2>
         </div>
         {/* bottom */}
         <div className="flex flex-wrap items-center justify-between gap-8">

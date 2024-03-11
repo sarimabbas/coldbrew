@@ -40,8 +40,8 @@ const CaskCard = ({
         className
       )}
     >
-      <div className="flex gap-4 justify-between">
-        <div>{cask.name || cask.id}</div>
+      <div className="flex justify-between gap-4">
+        <div className="break-all">{cask.name || cask.id}</div>
         {cask.logoUrl && (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -51,13 +51,13 @@ const CaskCard = ({
             src={cask.logoUrl}
             alt={cask.name ?? cask.id}
             loading="lazy"
-            className="h-10 max-h-10 w-10 object-cover rounded-full overflow-hidden flex-shrink-0 border invisible"
+            className="flex-shrink-0 invisible object-cover w-10 h-10 overflow-hidden border rounded-full max-h-10"
           />
         )}
       </div>
       <div className="flex flex-col gap-4">
-        <div className="font-mono text-xs">{cask.id}</div>
-        <div className="flex gap-4 opacity-50 text-sm">
+        <div className="overflow-hidden font-mono break-all">{cask.id}</div>
+        <div className="flex gap-4 text-sm opacity-50">
           <div className="">#{cask.ranking}</div>
           <div>{cask.installCount} installs</div>
         </div>
