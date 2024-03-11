@@ -1,4 +1,4 @@
-export enum SplitbeeEvents {
+export enum VercelAnalyticsEvents {
   ClickedCart = "ClickedCart",
   ClickedSearch = "ClickedSearch",
   ClickedCopyDownload = "ClickedCopyDownload",

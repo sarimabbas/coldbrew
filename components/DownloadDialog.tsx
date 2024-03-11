@@ -7,7 +7,7 @@ import * as Dialog from "@radix-ui/react-dialog";
 import { track } from "@vercel/analytics";
 import { useAtom } from "jotai";
 import Link from "next/link";
-import { SplitbeeEvents } from "../lib/analytics";
+import { VercelAnalyticsEvents } from "../lib/analytics";
 import { showDownloadDialogAtom } from "../lib/store";
 import useClipboard from "../lib/useClipboard";
 import { useSession } from "../lib/useSession";
@@ -81,7 +81,7 @@ const DownloadDialog = (props: IDownloadDialogProps) => {
               </div>
               <button
                 onClick={() => {
-                  track(SplitbeeEvents.ClickedCopyDownload);
+                  track(VercelAnalyticsEvents.ClickedCopyDownload);
                   copyShellCommand();
                 }}
               >
@@ -94,7 +94,7 @@ const DownloadDialog = (props: IDownloadDialogProps) => {
             </div>
             <pre
               className="p-4 my-4 overflow-x-auto surface edges chisel"
-              onClick={() => track(SplitbeeEvents.ClickedLinkDownload)}
+              onClick={() => track(VercelAnalyticsEvents.ClickedLinkDownload)}
             >
               <code>{shellCommand}</code>
             </pre>
@@ -105,7 +105,9 @@ const DownloadDialog = (props: IDownloadDialogProps) => {
                   href={brewfileLink}
                   target="_blank"
                   rel="noreferrer"
-                  onClick={() => track(SplitbeeEvents.ClickedLinkBrewfile)}
+                  onClick={() =>
+                    track(VercelAnalyticsEvents.ClickedLinkBrewfile)
+                  }
                 >
                   Brewfile
                 </Link>
@@ -131,7 +133,7 @@ const DownloadDialog = (props: IDownloadDialogProps) => {
               </div>
               <button
                 onClick={() => {
-                  track(SplitbeeEvents.ClickedCopyShare);
+                  track(VercelAnalyticsEvents.ClickedCopyShare);
                   copyShareLink();
                 }}
               >
@@ -144,7 +146,7 @@ const DownloadDialog = (props: IDownloadDialogProps) => {
             </div>
             <pre
               className="p-4 mt-4 overflow-x-auto surface edges chisel"
-              onClick={() => track(SplitbeeEvents.ClickedLinkShare)}
+              onClick={() => track(VercelAnalyticsEvents.ClickedLinkShare)}
             >
               <code>{shareLink}</code>
             </pre>

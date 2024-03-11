@@ -69,7 +69,7 @@ const About = () => {
         !
       </p>
       <p>
-        Oh also, you should know that I collect page-view data with Splitbee
+        Oh also, you should know that I collect page-view data with Vercel
         analytics.
       </p>
       <h3>Built with</h3>
