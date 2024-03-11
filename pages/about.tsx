@@ -75,8 +75,8 @@ const About = () => {
       <h3>Built with</h3>
       <p>
         Coldbrew was built with the Homebrew API, the results of which are
-        stored in a PlanetScale database. The data is queried by a NextJS app
-        with React Query and TRPC. The app is styled with Tailwind.
+        stored in a Supabase database. The data is queried by a NextJS app with
+        React Query and TRPC. The app is styled with Tailwind.
       </p>
     </div>
   );
