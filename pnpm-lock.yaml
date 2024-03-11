@@ -35,9 +35,6 @@ dependencies:
   babel-plugin-superjson-next:
     specifier: ^0.4.3
     version: 0.4.5(next@13.1.6)(superjson@1.12.2)
-  bunnygram:
-    specifier: ^1.0.0
-    version: 1.0.0
   classnames:
     specifier: ^2.3.1
     version: 2.3.2
@@ -145,10 +142,6 @@ packages:
       '@babel/helper-string-parser': 7.19.4
       '@babel/helper-validator-identifier': 7.19.1
       to-fast-properties: 2.0.0
-    dev: false
-
-  /@deno/shim-crypto@0.3.1:
-    resolution: {integrity: sha512-ed4pNnfur6UbASEgF34gVxR9p7Mc3qF+Ygbmjiil8ws5IhNFhPDFy5vE5hQAUA9JmVsSxXPcVLM5Rf8LOZqQ5Q==}
     dev: false
 
   /@eslint/eslintrc@1.4.1:
@@ -772,12 +765,6 @@ packages:
       eslint-visitor-keys: 3.3.0
     dev: true
 
-  /@upstash/qstash@0.3.4:
-    resolution: {integrity: sha512-M3flEZueu5eKhmqZAn8dT9Cp5wC5OePyD0lwreVLSsj60oqy77DtoLUasttLnnJiDS18wdXFi6Sg0ZO8en2e0w==}
-    dependencies:
-      '@deno/shim-crypto': 0.3.1
-    dev: false
-
   /@vercel/analytics@1.2.2(next@13.1.6)(react@18.2.0):
     resolution: {integrity: sha512-X0rctVWkQV1e5Y300ehVNqpOfSOufo7ieA5PIdna8yX/U7Vjz0GFsGf4qvAhxV02uQ2CVt7GYcrFfddXXK2Y4A==}
     peerDependencies:
@@ -1030,13 +1017,6 @@ packages:
       node-releases: 2.0.10
       update-browserslist-db: 1.0.10(browserslist@4.21.5)
     dev: true
-
-  /bunnygram@1.0.0:
-    resolution: {integrity: sha512-W2/ME/F8OkgUsxg9FAEOYCKlF3U2ZvTdlAIXAId46APqRZ27uyjdh6ei2CcQ2qbvRBEBPyDXZnh/WlwuxBNQew==}
-    dependencies:
-      '@upstash/qstash': 0.3.4
-      zod: 3.20.6
-    dev: false
 
   /call-bind@1.0.2:
     resolution: {integrity: sha512-7O+FbCihrB5WGbFYesctwmTKae6rOiIzmz1icreWJ+0aA7LJfuqhEso2T9ncpcFtzMQtzXf2QGGueWJGTYsqrA==}
