@@ -38,7 +38,6 @@
     "zod": "^3.17.3"
   },
   "devDependencies": {
-    "@netlify/functions": "^1.0.0",
     "@tailwindcss/typography": "^0.5.2",
     "@types/node": "^18.13.0",
     "@types/react": "18.0.27",
