@@ -1,6 +1,5 @@
 import { httpLink } from "@trpc/client/links/httpLink";
 import { withTRPC } from "@trpc/next";
-import { Analytics } from "@vercel/analytics/react";
 import { ThemeProvider } from "next-themes";
 import { AppType } from "next/dist/shared/lib/utils";
 import { ReactQueryDevtools } from "react-query/devtools";
@@ -15,7 +14,6 @@ const MyApp: AppType = ({ Component, pageProps }) => {
         <link rel="icon" type="image/png" href="/favicon.png" />
       </Head>
       <Component {...pageProps} />
-      <Analytics />
       {process.env.NODE_ENV !== "production" && (
         <ReactQueryDevtools initialIsOpen={false} />
       )}
