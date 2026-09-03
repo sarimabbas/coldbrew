@@ -4,10 +4,8 @@ import {
   XCircleIcon,
 } from "@heroicons/react/24/solid";
 import * as Dialog from "@radix-ui/react-dialog";
-import { track } from "@vercel/analytics";
 import { useAtom } from "jotai";
 import Link from "next/link";
-import { VercelAnalyticsEvents } from "../lib/analytics";
 import { showDownloadDialogAtom } from "../lib/store";
 import useClipboard from "../lib/useClipboard";
 import { useSession } from "../lib/useSession";
@@ -19,23 +17,20 @@ const DownloadDialog = (props: IDownloadDialogProps) => {
   const { session, isCaskSelected, toggleSelectedCask } = useSession();
   const [isOpen, setIsOpen] = useAtom(showDownloadDialogAtom);
 
-  const shellCommand = `curl -sSL "${
+  const baseUrl =
     process.env.NODE_ENV === "development"
       ? "http://localhost:3000/"
-      : "https://coldbrew.vercel.app/"
-  }api/download?session=${encodeURIComponent(session?.id ?? "")}" | sh`;
+      : "https://coldbrew.lil.run/";
 
-  const brewfileLink = `${
-    process.env.NODE_ENV === "development"
-      ? "http://localhost:3000/"
-      : "https://coldbrew.vercel.app/"
-  }api/download?session=${encodeURIComponent(session?.id ?? "")}&file=true`;
+  const shellCommand = `curl -sSL "${baseUrl}api/download?session=${encodeURIComponent(
+    session?.id ?? "",
+  )}" | sh`;
 
-  const shareLink = `${
-    process.env.NODE_ENV === "development"
-      ? "http://localhost:3000/"
-      : "https://coldbrew.vercel.app/"
-  }?session=${encodeURIComponent(session?.id ?? "")}`;
+  const brewfileLink = `${baseUrl}api/download?session=${encodeURIComponent(
+    session?.id ?? "",
+  )}&file=true`;
+
+  const shareLink = `${baseUrl}?session=${encodeURIComponent(session?.id ?? "")}`;
 
   const { copyText: copyShellCommand, isHot: copyShellCommandHot } =
     useClipboard({ text: shellCommand });
@@ -81,7 +76,6 @@ const DownloadDialog = (props: IDownloadDialogProps) => {
               </div>
               <button
                 onClick={() => {
-                  track(VercelAnalyticsEvents.ClickedCopyDownload);
                   copyShellCommand();
                 }}
               >
@@ -94,7 +88,6 @@ const DownloadDialog = (props: IDownloadDialogProps) => {
             </div>
             <pre
               className="p-4 my-4 overflow-x-auto surface edges chisel"
-              onClick={() => track(VercelAnalyticsEvents.ClickedLinkDownload)}
             >
               <code>{shellCommand}</code>
             </pre>
@@ -105,9 +98,6 @@ const DownloadDialog = (props: IDownloadDialogProps) => {
                   href={brewfileLink}
                   target="_blank"
                   rel="noreferrer"
-                  onClick={() =>
-                    track(VercelAnalyticsEvents.ClickedLinkBrewfile)
-                  }
                 >
                   Brewfile
                 </Link>
@@ -133,7 +123,6 @@ const DownloadDialog = (props: IDownloadDialogProps) => {
               </div>
               <button
                 onClick={() => {
-                  track(VercelAnalyticsEvents.ClickedCopyShare);
                   copyShareLink();
                 }}
               >
@@ -146,7 +135,6 @@ const DownloadDialog = (props: IDownloadDialogProps) => {
             </div>
             <pre
               className="p-4 mt-4 overflow-x-auto surface edges chisel"
-              onClick={() => track(VercelAnalyticsEvents.ClickedLinkShare)}
             >
               <code>{shareLink}</code>
             </pre>

@@ -22,7 +22,6 @@
     "@trpc/next": "^9.25.2",
     "@trpc/react": "^9.25.2",
     "@trpc/server": "^9.25.2",
-    "@vercel/analytics": "^1.2.2",
     "babel-plugin-superjson-next": "^0.4.3",
     "classnames": "^2.3.1",
     "jotai": "^2.0.1",
