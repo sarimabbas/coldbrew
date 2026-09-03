@@ -203,6 +203,19 @@ async function refreshCasks(env: Env) {
       installPercent: item.percent,
     };
   });
+  // Updating the entire Homebrew catalog in one run can exhaust D1's daily
+  // rows-written allowance, especially because indexed columns cost extra
+  // writes. Rotate through a bounded slice so the full catalog is refreshed
+  // approximately once a week while keeping each daily run predictable.
+  const refreshBatchSize = 4_000;
+  const batchCount = Math.max(1, Math.ceil(rows.length / refreshBatchSize));
+  const utcDay = Math.floor(Date.now() / 86_400_000);
+  const batchIndex = utcDay % batchCount;
+  const rowsToRefresh = rows.slice(
+    batchIndex * refreshBatchSize,
+    (batchIndex + 1) * refreshBatchSize,
+  );
+
   const upsert = `
     INSERT INTO "Cask" (id, name, homepage, "logoUrl", ranking, "installCount", "installPercent", "createdAt", "updatedAt")
     SELECT
@@ -212,11 +225,19 @@ async function refreshCasks(env: Env) {
       json_extract(value, '$.installPercent'), datetime('now'), datetime('now')
     FROM json_each(?) WHERE true
     ON CONFLICT(id) DO UPDATE SET
-      name = excluded.name, homepage = excluded.homepage, ranking = excluded.ranking,
+      name = excluded.name, homepage = excluded.homepage, "logoUrl" = excluded."logoUrl",
+      ranking = excluded.ranking,
       "installCount" = excluded."installCount", "installPercent" = excluded."installPercent",
-      "updatedAt" = datetime('now')`;
-  for (let offset = 0; offset < rows.length; offset += 250) {
-    await env.DB.prepare(upsert).bind(JSON.stringify(rows.slice(offset, offset + 250))).run();
+      "updatedAt" = datetime('now')
+    WHERE
+      name IS NOT excluded.name OR homepage IS NOT excluded.homepage OR
+      "logoUrl" IS NOT excluded."logoUrl" OR ranking IS NOT excluded.ranking OR
+      "installCount" IS NOT excluded."installCount" OR
+      "installPercent" IS NOT excluded."installPercent"`;
+  for (let offset = 0; offset < rowsToRefresh.length; offset += 250) {
+    await env.DB.prepare(upsert)
+      .bind(JSON.stringify(rowsToRefresh.slice(offset, offset + 250)))
+      .run();
   }
 }
 
@@ -228,10 +249,9 @@ export default {
         return handleTrpc(request, env, decodeURIComponent(url.pathname.slice(10)));
       }
       if (url.pathname === "/api/download") return download(request, env);
-      if (url.pathname === "/api/extract-background") {
-        await refreshCasks(env);
-        return new Response("ok");
-      }
+      // Catalog refreshes are intentionally cron-only. Exposing this as a
+      // public route allowed anyone to consume the account's D1 write quota.
+      if (url.pathname === "/api/extract-background") return new Response("Not found", { status: 404 });
       return env.ASSETS.fetch(request);
     } catch (cause) {
       console.error(cause);
