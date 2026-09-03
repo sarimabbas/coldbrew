@@ -1,6 +1,7 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "coldbrew",
+  "account_id": "f7df7fafe5b4e9d4e0446100575c0bf4",
   "main": "worker/index.ts",
   "compatibility_date": "2026-09-03",
   "compatibility_flags": ["nodejs_compat"],
