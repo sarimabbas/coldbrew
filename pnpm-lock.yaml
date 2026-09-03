@@ -8,9 +8,6 @@ dependencies:
   '@heroicons/react':
     specifier: ^2.0.15
     version: 2.0.15(react@18.2.0)
-  '@neondatabase/serverless':
-    specifier: ^1.0.2
-    version: 1.1.0
   '@prisma/client':
     specifier: ^4.10.1
     version: 4.10.1(prisma@4.10.1)
@@ -770,11 +767,6 @@ packages:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.6.0
     dev: true
-
-  /@neondatabase/serverless@1.1.0:
-    resolution: {integrity: sha512-r3ZZhRjEcfEdKIZnoB1RusNgvHuaBRqfCzV4Gi+5A9yUX0S4HTws/ASWqt13wL4y4I+0rqsWGdA2w7EQXHi3+Q==}
-    engines: {node: '>=19.0.0'}
-    dev: false
 
   /@next/env@13.1.6:
     resolution: {integrity: sha512-s+W9Fdqh5MFk6ECrbnVmmAOwxKQuhGMT7xXHrkYIBMBcTiOqNWhv5KbJIboKR5STXxNXl32hllnvKaffzFaWQg==}

@@ -1,8 +1,6 @@
-import { neon } from "@neondatabase/serverless";
-
 interface Env {
   ASSETS: Fetcher;
-  DATABASE_URL: string;
+  DB: D1Database;
 }
 
 type Cask = {
@@ -35,87 +33,117 @@ const parseInput = async (request: Request) => {
   return body ? JSON.parse(body) : null;
 };
 
-const sessionWithCasks = async (sql: ReturnType<typeof neon>, id: string) => {
-  const sessions = await sql.query(
-    'SELECT id, "createdAt", "updatedAt" FROM "Session" WHERE id = $1 LIMIT 1',
-    [id],
-  );
-  if (!sessions[0]) return null;
-  const casks = await sql.query(
-    'SELECT c.* FROM "Cask" c JOIN "_CaskToSession" r ON r."A" = c.id WHERE r."B" = $1 ORDER BY c.ranking ASC',
-    [id],
-  );
-  return { ...sessions[0], casks };
+const sessionWithCasks = async (db: D1Database, id: string) => {
+  const session = await db
+    .prepare('SELECT id, "createdAt", "updatedAt" FROM "Session" WHERE id = ? LIMIT 1')
+    .bind(id)
+    .first();
+  if (!session) return null;
+  const { results: casks } = await db
+    .prepare(
+      'SELECT c.* FROM "Cask" c JOIN "_CaskToSession" r ON r."A" = c.id WHERE r."B" = ? ORDER BY c.ranking ASC',
+    )
+    .bind(id)
+    .all<Cask>();
+  return { ...session, casks };
 };
 
-const authorized = async (sql: ReturnType<typeof neon>, id: string, token: string) => {
-  const rows = await sql.query(
-    'SELECT id FROM "Session" WHERE id = $1 AND "accessToken" = $2 LIMIT 1',
-    [id, token],
+const authorized = async (db: D1Database, id: string, token: string) =>
+  Boolean(
+    await db
+      .prepare('SELECT id FROM "Session" WHERE id = ? AND "accessToken" = ? LIMIT 1')
+      .bind(id, token)
+      .first(),
   );
-  return Boolean(rows[0]);
-};
 
 async function handleTrpc(request: Request, env: Env, procedure: string) {
-  const sql = neon(env.DATABASE_URL);
   const input = await parseInput(request);
 
   if (procedure === "getCasks") {
     const query = input?.query ?? "";
     const skip = Number(input?.skip ?? 0);
     const take = Math.min(Number(input?.take ?? 200), 200);
-    const pattern = `%${query}%`;
-    const rows = await sql.query(
-      'SELECT * FROM "Cask" WHERE ($1 = \'\' OR name ILIKE $2 OR id ILIKE $2) ORDER BY ranking ASC NULLS LAST OFFSET $3 LIMIT $4',
-      [query, pattern, skip, take],
-    );
-    return json(rows);
+    const { results } = await env.DB.prepare(
+      `SELECT * FROM "Cask"
+       WHERE (? = '' OR name LIKE ? COLLATE NOCASE OR id LIKE ? COLLATE NOCASE)
+       ORDER BY ranking IS NULL, ranking ASC LIMIT ? OFFSET ?`,
+    )
+      .bind(query, `%${query}%`, `%${query}%`, take, skip)
+      .all<Cask>();
+    return json(results);
   }
 
   if (procedure === "getLastUpdated") {
-    const rows = await sql.query('SELECT "updatedAt" FROM "Cask" ORDER BY "updatedAt" DESC LIMIT 1');
-    return json(rows[0]?.updatedAt ?? null);
+    const row = await env.DB.prepare(
+      'SELECT "updatedAt" FROM "Cask" ORDER BY "updatedAt" DESC LIMIT 1',
+    ).first<{ updatedAt: string }>();
+    return json(row?.updatedAt ?? null);
   }
 
-  if (procedure === "getSession") return json(await sessionWithCasks(sql, input?.sessionId));
+  if (procedure === "getSession") return json(await sessionWithCasks(env.DB, input?.sessionId));
 
   if (procedure === "createNewSession") {
     const id = crypto.randomUUID();
     const accessToken = crypto.randomUUID();
-    const rows = await sql.query(
-      'INSERT INTO "Session" (id, "accessToken", "createdAt", "updatedAt") VALUES ($1, $2, NOW(), NOW()) RETURNING *',
-      [id, accessToken],
-    );
-    return json(rows[0]);
+    const now = new Date().toISOString();
+    await env.DB.prepare(
+      'INSERT INTO "Session" (id, "accessToken", "createdAt", "updatedAt") VALUES (?, ?, ?, ?)',
+    )
+      .bind(id, accessToken, now, now)
+      .run();
+    return json({ id, accessToken, createdAt: now, updatedAt: now });
   }
 
   if (procedure === "addCaskToSession" || procedure === "removeCaskFromSession") {
-    if (!(await authorized(sql, input?.sessionId, input?.accessToken))) {
+    if (!(await authorized(env.DB, input?.sessionId, input?.accessToken))) {
       return error("Access token not valid for this operation", "UNAUTHORIZED", 401);
     }
     if (procedure === "addCaskToSession") {
-      await sql.query(
-        'INSERT INTO "_CaskToSession" ("A", "B") VALUES ($1, $2) ON CONFLICT DO NOTHING',
-        [input.caskId, input.sessionId],
-      );
+      await env.DB.prepare(
+        'INSERT OR IGNORE INTO "_CaskToSession" ("A", "B") VALUES (?, ?)',
+      )
+        .bind(input.caskId, input.sessionId)
+        .run();
     } else {
-      await sql.query('DELETE FROM "_CaskToSession" WHERE "A" = $1 AND "B" = $2', [input.caskId, input.sessionId]);
+      await env.DB.prepare('DELETE FROM "_CaskToSession" WHERE "A" = ? AND "B" = ?')
+        .bind(input.caskId, input.sessionId)
+        .run();
     }
-    await sql.query('UPDATE "Session" SET "updatedAt" = NOW() WHERE id = $1', [input.sessionId]);
-    return json(await sessionWithCasks(sql, input.sessionId));
+    await env.DB.prepare('UPDATE "Session" SET "updatedAt" = ? WHERE id = ?')
+      .bind(new Date().toISOString(), input.sessionId)
+      .run();
+    return json(await sessionWithCasks(env.DB, input.sessionId));
   }
 
   if (procedure === "copyCasksBetweenSessions") {
-    if (!(await authorized(sql, input?.destinationSessionId, input?.destinationSessionAccessToken))) {
+    if (
+      !(await authorized(
+        env.DB,
+        input?.destinationSessionId,
+        input?.destinationSessionAccessToken,
+      ))
+    ) {
       return error("Destination session not found", "NOT_FOUND", 404);
     }
-    await sql.query(
-      'INSERT INTO "_CaskToSession" ("A", "B") SELECT "A", $2 FROM "_CaskToSession" WHERE "B" = $1 ON CONFLICT DO NOTHING',
-      [input.sourceSessionId, input.destinationSessionId],
-    );
-    await sql.query('UPDATE "Session" SET "updatedAt" = NOW() WHERE id = $1', [input.destinationSessionId]);
-    const rows = await sql.query('SELECT id, "createdAt", "updatedAt" FROM "Session" WHERE id = $1', [input.destinationSessionId]);
-    return json(rows[0]);
+    const source = await env.DB.prepare('SELECT id FROM "Session" WHERE id = ? LIMIT 1')
+      .bind(input.sourceSessionId)
+      .first();
+    if (!source) return error("Source session not found", "NOT_FOUND", 404);
+    await env.DB.prepare(
+      'INSERT OR IGNORE INTO "_CaskToSession" ("A", "B") SELECT "A", ? FROM "_CaskToSession" WHERE "B" = ?',
+    )
+      .bind(input.destinationSessionId, input.sourceSessionId)
+      .run();
+    const now = new Date().toISOString();
+    await env.DB.prepare('UPDATE "Session" SET "updatedAt" = ? WHERE id = ?')
+      .bind(now, input.destinationSessionId)
+      .run();
+    const session = await env.DB.prepare(
+      'SELECT id, "createdAt", "updatedAt" FROM "Session" WHERE id = ?',
+    )
+      .bind(input.destinationSessionId)
+      .first();
+    return json(session);
   }
 
   return error("No procedure found", "NOT_FOUND", 404);
@@ -125,16 +153,25 @@ async function download(request: Request, env: Env) {
   const url = new URL(request.url);
   const sessionId = url.searchParams.get("session");
   if (!sessionId) return new Response("no session param", { status: 400 });
-  const sql = neon(env.DATABASE_URL);
-  const rows = await sql.query(
-    'SELECT c.id FROM "Cask" c JOIN "_CaskToSession" r ON r."A" = c.id WHERE r."B" = $1 ORDER BY c.ranking ASC',
-    [sessionId],
-  );
-  const brewfile = rows.map((row) => `cask "${row.id}"`).join("\n");
+  const { results } = await env.DB.prepare(
+    'SELECT c.id FROM "Cask" c JOIN "_CaskToSession" r ON r."A" = c.id WHERE r."B" = ? ORDER BY c.ranking ASC',
+  )
+    .bind(sessionId)
+    .all<{ id: string }>();
+  const brewfile = results.map((row) => `cask "${row.id}"`).join("\n");
   if (url.searchParams.has("file")) {
-    return new Response(brewfile, { headers: { "content-type": "text/plain", "content-disposition": "attachment; filename=Brewfile" } });
+    return new Response(brewfile, {
+      headers: {
+        "content-type": "text/plain",
+        "content-disposition": "attachment; filename=Brewfile",
+      },
+    });
   }
-  return new Response(["#!/bin/sh", "brew bundle --no-lock --file=/dev/stdin <<EOF", brewfile, "EOF"].join("\n\n"));
+  return new Response(
+    ["#!/bin/sh", "brew bundle --no-lock --file=/dev/stdin <<EOF", brewfile, "EOF"].join(
+      "\n\n",
+    ),
+  );
 }
 
 async function refreshCasks(env: Env) {
@@ -142,8 +179,17 @@ async function refreshCasks(env: Env) {
     fetch("https://formulae.brew.sh/api/analytics/cask-install/365d.json"),
     fetch("https://formulae.brew.sh/api/cask.json"),
   ]);
-  const analytics = (await analyticsResponse.json()) as { items?: Array<{ cask: string; count: string; percent: string; number: number }> };
-  const details = (await detailsResponse.json()) as Array<{ token: string; homepage?: string; name?: string[] }>;
+  if (!analyticsResponse.ok || !detailsResponse.ok) {
+    throw new Error("Homebrew API refresh failed");
+  }
+  const analytics = (await analyticsResponse.json()) as {
+    items?: Array<{ cask: string; count: string; percent: string; number: number }>;
+  };
+  const details = (await detailsResponse.json()) as Array<{
+    token: string;
+    homepage?: string;
+    name?: string[];
+  }>;
   const detailMap = new Map(details.map((item) => [item.token, item]));
   const rows = (analytics.items ?? []).map((item) => {
     const detail = detailMap.get(item.cask);
@@ -157,22 +203,30 @@ async function refreshCasks(env: Env) {
       installPercent: item.percent,
     };
   });
-  const sql = neon(env.DATABASE_URL);
-  await sql.query(
-    `INSERT INTO "Cask" (id, name, homepage, "logoUrl", ranking, "installCount", "installPercent", "createdAt", "updatedAt")
-     SELECT x.id, x.name, x.homepage, x."logoUrl", x.ranking, x."installCount", x."installPercent", NOW(), NOW()
-     FROM jsonb_to_recordset($1::jsonb) AS x(id text, name text, homepage text, "logoUrl" text, ranking int, "installCount" text, "installPercent" text)
-     ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name, homepage = EXCLUDED.homepage, ranking = EXCLUDED.ranking,
-       "installCount" = EXCLUDED."installCount", "installPercent" = EXCLUDED."installPercent", "updatedAt" = NOW()`,
-    [JSON.stringify(rows)],
-  );
+  const upsert = `
+    INSERT INTO "Cask" (id, name, homepage, "logoUrl", ranking, "installCount", "installPercent", "createdAt", "updatedAt")
+    SELECT
+      json_extract(value, '$.id'), json_extract(value, '$.name'),
+      json_extract(value, '$.homepage'), json_extract(value, '$.logoUrl'),
+      json_extract(value, '$.ranking'), json_extract(value, '$.installCount'),
+      json_extract(value, '$.installPercent'), datetime('now'), datetime('now')
+    FROM json_each(?) WHERE true
+    ON CONFLICT(id) DO UPDATE SET
+      name = excluded.name, homepage = excluded.homepage, ranking = excluded.ranking,
+      "installCount" = excluded."installCount", "installPercent" = excluded."installPercent",
+      "updatedAt" = datetime('now')`;
+  for (let offset = 0; offset < rows.length; offset += 250) {
+    await env.DB.prepare(upsert).bind(JSON.stringify(rows.slice(offset, offset + 250))).run();
+  }
 }
 
 export default {
   async fetch(request: Request, env: Env) {
     try {
       const url = new URL(request.url);
-      if (url.pathname.startsWith("/api/trpc/")) return handleTrpc(request, env, decodeURIComponent(url.pathname.slice(10)));
+      if (url.pathname.startsWith("/api/trpc/")) {
+        return handleTrpc(request, env, decodeURIComponent(url.pathname.slice(10)));
+      }
       if (url.pathname === "/api/download") return download(request, env);
       if (url.pathname === "/api/extract-background") {
         await refreshCasks(env);

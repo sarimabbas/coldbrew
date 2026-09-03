@@ -15,6 +15,13 @@
     "binding": "ASSETS",
     "run_worker_first": ["/api/*"]
   },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "coldbrew",
+      "database_id": "2aac40ec-579b-4682-8f1f-ad49a4b12df8"
+    }
+  ],
   "triggers": {
     "crons": ["0 10 * * *"]
   },
