@@ -11,11 +11,11 @@ A visual interface to quickly install your favorite macOS apps from Homebrew Cas
 
 ## Stack
 
-- Vercel
+- Cloudflare Workers
+- Cloudflare D1
 - Next.js
 - Tailwind CSS
 - Prisma
-- Vercel/Neon Postgres
 - TRPC
 - TypeScript
 

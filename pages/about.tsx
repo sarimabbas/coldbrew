@@ -60,15 +60,12 @@ const About = () => {
         visit the share link, every app linked to your session will be copied
         over to a new session for them.
       </p>
-      <p>
-        Oh also, you should know that I collect page-view data with Vercel
-        analytics.
-      </p>
       <h3>Built with</h3>
       <p>
         Coldbrew was built with the Homebrew API, the results of which are
-        stored in a Neon database. The data is queried by a NextJS app with
-        React Query and TRPC. The app is styled with Tailwind.
+        stored in a Cloudflare D1 database. A Cloudflare Worker serves the API
+        and refreshes the catalog daily. The interface uses Next.js, React
+        Query, tRPC, and Tailwind.
       </p>
     </div>
   );
