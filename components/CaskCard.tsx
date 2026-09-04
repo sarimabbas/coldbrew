@@ -19,6 +19,12 @@ const CaskCard = ({
   style,
   disabled,
 }: ICaskCardProps) => {
+  const imageUrl = cask.homepage
+    ? `https://www.google.com/s2/favicons?domain_url=${encodeURIComponent(
+        cask.homepage
+      )}&sz=128`
+    : cask.logoUrl;
+
   return (
     <div
       onClick={() => {
@@ -42,13 +48,13 @@ const CaskCard = ({
     >
       <div className="flex justify-between gap-4">
         <div className="break-all">{cask.name || cask.id}</div>
-        {cask.logoUrl && (
+        {imageUrl && (
           // eslint-disable-next-line @next/next/no-img-element
           <img
             onLoad={(event) =>
               (event.currentTarget.style.visibility = "visible")
             }
-            src={cask.logoUrl}
+            src={imageUrl}
             alt={cask.name ?? cask.id}
             loading="lazy"
             className="flex-shrink-0 invisible object-cover w-10 h-10 overflow-hidden border rounded-full max-h-10"

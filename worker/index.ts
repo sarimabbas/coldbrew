@@ -197,7 +197,9 @@ async function refreshCasks(env: Env) {
       id: item.cask,
       name: detail?.name?.[0] ?? null,
       homepage: detail?.homepage ?? null,
-      logoUrl: detail?.homepage ? `https://logo.clearbit.com/${detail.homepage}` : null,
+      logoUrl: detail?.homepage
+        ? `https://www.google.com/s2/favicons?domain_url=${encodeURIComponent(detail.homepage)}&sz=128`
+        : null,
       ranking: item.number,
       installCount: item.count,
       installPercent: item.percent,
