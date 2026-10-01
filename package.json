@@ -11,7 +11,8 @@
     "prisma:push": "npx prisma db push",
     "prisma:generate": "npx prisma generate",
     "prisma:studio": "npx prisma studio",
-    "prisma:ci": "npx prisma generate"
+    "prisma:ci": "npx prisma generate",
+    "test": "tsx --test tests/*.test.ts"
   },
   "dependencies": {
     "@heroicons/react": "^2.0.15",
@@ -45,6 +46,7 @@
     "eslint-config-next": "13.1.6",
     "postcss": "^8.4.14",
     "tailwindcss": "^3.1.3",
+    "tsx": "^4.23.15",
     "typescript": "^4.7.3",
     "wrangler": "^4.129.0"
   },
