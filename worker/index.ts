@@ -1,19 +1,10 @@
+import { Cask, loadCatalog, refreshCatalog, searchCatalog } from "./catalog";
+
 interface Env {
   ASSETS: Fetcher;
   DB: D1Database;
+  CATALOG: KVNamespace;
 }
-
-type Cask = {
-  id: string;
-  createdAt: string;
-  updatedAt: string;
-  name: string | null;
-  homepage: string | null;
-  logoUrl: string | null;
-  ranking: number | null;
-  installCount: string | null;
-  installPercent: string | null;
-};
 
 const json = (data: unknown, status = 200) =>
   Response.json({ id: null, result: { type: "data", data } }, { status });
@@ -56,28 +47,40 @@ const authorized = async (db: D1Database, id: string, token: string) =>
       .first(),
   );
 
-async function handleTrpc(request: Request, env: Env, procedure: string) {
+async function publicCatalogResponse(request: Request, ctx: ExecutionContext, key: string, read: () => Promise<Response>) {
+  const cacheKey = new Request(new URL(`/__catalog/${key}`, request.url));
+  const cache = caches.default;
+  const hit = await cache.match(cacheKey);
+  if (hit) return hit;
+  const response = await read();
+  response.headers.set("Cache-Control", "public, max-age=300, s-maxage=900");
+  ctx.waitUntil(cache.put(cacheKey, response.clone()));
+  return response;
+}
+
+async function handleTrpc(request: Request, env: Env, procedure: string, ctx: ExecutionContext) {
   const input = await parseInput(request);
 
-  if (procedure === "getCasks") {
+  if (procedure === "getCasks" || procedure === "getLastUpdated") {
+    if (request.method !== "GET") return error("Use GET for catalog queries", "METHOD_NOT_SUPPORTED", 405);
+    if (procedure === "getLastUpdated") {
+      return publicCatalogResponse(request, ctx, "updatedAt", async () =>
+        json(await env.CATALOG.get("updatedAt", { cacheTtl: 900 })),
+      );
+    }
     const query = input?.query ?? "";
-    const skip = Number(input?.skip ?? 0);
-    const take = Math.min(Number(input?.take ?? 200), 200);
-    const { results } = await env.DB.prepare(
-      `SELECT * FROM "Cask"
-       WHERE (? = '' OR name LIKE ? COLLATE NOCASE OR id LIKE ? COLLATE NOCASE)
-       ORDER BY ranking IS NULL, ranking ASC LIMIT ? OFFSET ?`,
-    )
-      .bind(query, `%${query}%`, `%${query}%`, take, skip)
-      .all<Cask>();
-    return json(results);
-  }
-
-  if (procedure === "getLastUpdated") {
-    const row = await env.DB.prepare(
-      'SELECT "updatedAt" FROM "Cask" ORDER BY "updatedAt" DESC LIMIT 1',
-    ).first<{ updatedAt: string }>();
-    return json(row?.updatedAt ?? null);
+    const skip = input?.skip ?? 0;
+    const take = input?.take ?? 200;
+    if (typeof query !== "string" || query.length > 100 ||
+        !Number.isSafeInteger(skip) || skip < 0 || skip > 10_000 ||
+        !Number.isSafeInteger(take) || take < 1 || take > 200) {
+      return error("Invalid catalog query or pagination", "BAD_REQUEST", 400);
+    }
+    const normalized = query.trim().toLowerCase();
+    const key = `casks?query=${encodeURIComponent(normalized)}&skip=${skip}&take=${take}`;
+    return publicCatalogResponse(request, ctx, key, async () =>
+      json(searchCatalog(await loadCatalog(env.CATALOG), normalized, skip, take)),
+    );
   }
 
   if (procedure === "getSession") return json(await sessionWithCasks(env.DB, input?.sessionId));
@@ -99,6 +102,22 @@ async function handleTrpc(request: Request, env: Env, procedure: string) {
       return error("Access token not valid for this operation", "UNAUTHORIZED", 401);
     }
     if (procedure === "addCaskToSession") {
+      const cask = (await loadCatalog(env.CATALOG)).casks.find((cask) => cask.id === input.caskId);
+      if (!cask) return error("Cask is no longer available in Homebrew", "NOT_FOUND", 404);
+      // Persist only selected casks. Browsing and the daily refresh never touch D1.
+      await env.DB.prepare(`
+        INSERT INTO "Cask" (id, name, homepage, "logoUrl", ranking, "installCount", "installPercent", "createdAt", "updatedAt")
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ON CONFLICT(id) DO UPDATE SET name = excluded.name, homepage = excluded.homepage,
+          "logoUrl" = excluded."logoUrl", ranking = excluded.ranking,
+          "installCount" = excluded."installCount", "installPercent" = excluded."installPercent",
+          "updatedAt" = excluded."updatedAt"
+        WHERE name IS NOT excluded.name OR homepage IS NOT excluded.homepage OR
+          "logoUrl" IS NOT excluded."logoUrl" OR ranking IS NOT excluded.ranking OR
+          "installCount" IS NOT excluded."installCount" OR "installPercent" IS NOT excluded."installPercent"
+      `).bind(cask.id, cask.name, cask.homepage, cask.logoUrl, cask.ranking,
+        cask.installCount, cask.installPercent, cask.createdAt, cask.updatedAt).run();
+
       await env.DB.prepare(
         'INSERT OR IGNORE INTO "_CaskToSession" ("A", "B") VALUES (?, ?)',
       )
@@ -174,83 +193,14 @@ async function download(request: Request, env: Env) {
   );
 }
 
-async function refreshCasks(env: Env) {
-  const [analyticsResponse, detailsResponse] = await Promise.all([
-    fetch("https://formulae.brew.sh/api/analytics/cask-install/365d.json"),
-    fetch("https://formulae.brew.sh/api/cask.json"),
-  ]);
-  if (!analyticsResponse.ok || !detailsResponse.ok) {
-    throw new Error("Homebrew API refresh failed");
-  }
-  const analytics = (await analyticsResponse.json()) as {
-    items?: Array<{ cask: string; count: string; percent: string; number: number }>;
-  };
-  const details = (await detailsResponse.json()) as Array<{
-    token: string;
-    homepage?: string;
-    name?: string[];
-  }>;
-  const detailMap = new Map(details.map((item) => [item.token, item]));
-  const rows = (analytics.items ?? []).map((item) => {
-    const detail = detailMap.get(item.cask);
-    return {
-      id: item.cask,
-      name: detail?.name?.[0] ?? null,
-      homepage: detail?.homepage ?? null,
-      logoUrl: detail?.homepage
-        ? `https://www.google.com/s2/favicons?domain_url=${encodeURIComponent(detail.homepage)}&sz=128`
-        : null,
-      ranking: item.number,
-      installCount: item.count,
-      installPercent: item.percent,
-    };
-  });
-  // Updating the entire Homebrew catalog in one run can exhaust D1's daily
-  // rows-written allowance, especially because indexed columns cost extra
-  // writes. Rotate through a bounded slice so the full catalog is refreshed
-  // approximately once a week while keeping each daily run predictable.
-  const refreshBatchSize = 4_000;
-  const batchCount = Math.max(1, Math.ceil(rows.length / refreshBatchSize));
-  const utcDay = Math.floor(Date.now() / 86_400_000);
-  const batchIndex = utcDay % batchCount;
-  const rowsToRefresh = rows.slice(
-    batchIndex * refreshBatchSize,
-    (batchIndex + 1) * refreshBatchSize,
-  );
-
-  const upsert = `
-    INSERT INTO "Cask" (id, name, homepage, "logoUrl", ranking, "installCount", "installPercent", "createdAt", "updatedAt")
-    SELECT
-      json_extract(value, '$.id'), json_extract(value, '$.name'),
-      json_extract(value, '$.homepage'), json_extract(value, '$.logoUrl'),
-      json_extract(value, '$.ranking'), json_extract(value, '$.installCount'),
-      json_extract(value, '$.installPercent'), datetime('now'), datetime('now')
-    FROM json_each(?) WHERE true
-    ON CONFLICT(id) DO UPDATE SET
-      name = excluded.name, homepage = excluded.homepage, "logoUrl" = excluded."logoUrl",
-      ranking = excluded.ranking,
-      "installCount" = excluded."installCount", "installPercent" = excluded."installPercent",
-      "updatedAt" = datetime('now')
-    WHERE
-      name IS NOT excluded.name OR homepage IS NOT excluded.homepage OR
-      "logoUrl" IS NOT excluded."logoUrl" OR ranking IS NOT excluded.ranking OR
-      "installCount" IS NOT excluded."installCount" OR
-      "installPercent" IS NOT excluded."installPercent"`;
-  for (let offset = 0; offset < rowsToRefresh.length; offset += 250) {
-    await env.DB.prepare(upsert)
-      .bind(JSON.stringify(rowsToRefresh.slice(offset, offset + 250)))
-      .run();
-  }
-}
-
 export default {
-  async fetch(request: Request, env: Env) {
+  async fetch(request: Request, env: Env, ctx: ExecutionContext) {
     try {
       const url = new URL(request.url);
       if (url.pathname.startsWith("/api/trpc/")) {
-        return handleTrpc(request, env, decodeURIComponent(url.pathname.slice(10)));
+        return await handleTrpc(request, env, decodeURIComponent(url.pathname.slice(10)), ctx);
       }
-      if (url.pathname === "/api/download") return download(request, env);
+      if (url.pathname === "/api/download") return await download(request, env);
       // Catalog refreshes are intentionally cron-only. Exposing this as a
       // public route allowed anyone to consume the account's D1 write quota.
       if (url.pathname === "/api/extract-background") return new Response("Not found", { status: 404 });
@@ -261,6 +211,6 @@ export default {
     }
   },
   async scheduled(_controller: ScheduledController, env: Env, ctx: ExecutionContext) {
-    ctx.waitUntil(refreshCasks(env));
+    ctx.waitUntil(refreshCatalog(env.CATALOG));
   },
 };

@@ -23,6 +23,7 @@
       "database_id": "2aac40ec-579b-4682-8f1f-ad49a4b12df8"
     }
   ],
+  "kv_namespaces": [{ "binding": "CATALOG", "id": "b89e17b5bbc34b8f9b22ba3e467a11a6" }],
   "triggers": {
     "crons": ["0 10 * * *"]
   },
